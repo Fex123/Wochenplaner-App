@@ -1,3 +1,5 @@
+import 'taskStorage.dart';
+
 class Task {
 
   //obvious attributes
@@ -9,7 +11,7 @@ class Task {
 
   //internal attributes
 
-  int id;
+  late int id;
   bool isCompleted;
 
   Task({
@@ -17,9 +19,10 @@ class Task {
       required this.description,
       //required this.startDate,
       //required this.endDate,
-      required this.id, //To-Do: Automatically declare the id with the list length + 1
       required this.isCompleted,
-  });
+  }) {
+    id = TaskManager().tasks.length;
+  }
 
   void changeTaskState() {
     isCompleted = !isCompleted;
