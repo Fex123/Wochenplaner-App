@@ -10,26 +10,34 @@ class Createedittask extends StatelessWidget{
         appBar: AppBar(
           title: const Text('Create/Edit Task'),
         ),
-        body: const Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: TaskTextField(labelText: "Enter task name"),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: TaskTextField(labelText: "Enter task description"),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: selectDate(),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: saveButton(),
-              ),
-            ],
+        body: const SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TaskTextField(
+                      labelText: "Enter task name", widthMultiplyer: 2),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TaskTextField(
+                      labelText: "Enter task description", widthMultiplyer: 2),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SelectDate(),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SelectTime(),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SaveButton(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -40,19 +48,24 @@ class Createedittask extends StatelessWidget{
 class TaskTextField extends StatelessWidget {
   final String labelText;
   final String? value;
+  final double widthMultiplyer;
 
-  const TaskTextField({Key? key, required this.labelText, this.value}) : super(key: key);
+  const TaskTextField(
+      {super.key,
+      required this.labelText,
+      required this.widthMultiplyer,
+      this.value});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController controller = TextEditingController(text: value);
 
     return SizedBox(
-      width: 250,
+      width: 125 * widthMultiplyer,
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           labelText: labelText,
         ),
       ),
@@ -60,14 +73,14 @@ class TaskTextField extends StatelessWidget {
   }
 }
 
-class selectDate extends StatefulWidget {
-  const selectDate({super.key});
+class SelectDate extends StatefulWidget {
+  const SelectDate({super.key});
 
   @override
-  State<selectDate> createState() => _selectDateState();
+  State<SelectDate> createState() => _selectDateState();
 }
 
-class _selectDateState extends State<selectDate> {
+class _selectDateState extends State<SelectDate> {
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -90,39 +103,114 @@ class _selectDateState extends State<selectDate> {
         ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
         : '';
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text("              "),
-              TaskTextField(
-                labelText: 'Selected Date',
-                value: formattedDate,
-              ),
-            SizedBox(
-              width: 50, // Adjust the width as needed
-              child: IconButton(
-                icon: const Icon(Icons.calendar_today),
-                onPressed: () => _selectDate(context),
-              ),
+    return Center(
+      child: Stack(
+        children: <Widget>[
+          TaskTextField(
+            labelText: 'Selected Date',
+            widthMultiplyer: 2,
+            value: formattedDate,
+          ),
+          Positioned(
+            right: 0,
+            top: 5,
+            child: IconButton(
+              icon: const Icon(Icons.calendar_today),
+              onPressed: () => _selectDate(context),
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-class saveButton extends StatefulWidget {
-  const saveButton({super.key});
+class SelectTime extends StatefulWidget {
+  const SelectTime({super.key});
 
   @override
-  State<saveButton> createState() => _saveButtonState();
+  State<SelectTime> createState() => _selectTimeState();
 }
 
-class _saveButtonState extends State<saveButton> {
+class _selectTimeState extends State<SelectTime> {
+  TimeOfDay? _startTime;
+  TimeOfDay? _endTime;
+
+  Future<void> _selectTime(BuildContext context, bool isStartTime) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStartTime) {
+          _startTime = picked;
+        } else {
+          _endTime = picked;
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String formattedStartTime =
+        _startTime != null ? _startTime!.format(context) : '';
+    final String formattedEndTime =
+        _endTime != null ? _endTime!.format(context) : '';
+
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            children: <Widget>[
+              TaskTextField(
+                labelText: 'Start',
+                widthMultiplyer: 1,
+                value: formattedStartTime,
+              ),
+              Positioned(
+                right: 0,
+                top: 5,
+                child: IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () => _selectTime(context, true),
+                ),
+              ),
+            ],
+          ),
+          Stack(
+            children: <Widget>[
+              TaskTextField(
+                labelText: 'End',
+                widthMultiplyer: 1,
+                value: formattedEndTime,
+              ),
+              Positioned(
+                right: 0,
+                top: 5,
+                child: IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () => _selectTime(context, false),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SaveButton extends StatefulWidget {
+  const SaveButton({super.key});
+
+  @override
+  State<SaveButton> createState() => _saveButtonState();
+}
+
+class _saveButtonState extends State<SaveButton> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
