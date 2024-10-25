@@ -6,85 +6,132 @@ class Tasklistview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const Center(child: TaskListCard()),
-    );
-  }
-}
-
-class TaskListCard extends StatelessWidget {
-  const TaskListCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 350,  // Set max width of a Card
-        ),
-        child: Card(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(color: const Color.fromARGB(255, 184, 184, 184), width: 2), // Set the color and thickness of the outline
-            borderRadius: BorderRadius.circular(20), // Adjust the radius value to make the border rounder
-          ),
-          child: _SampleCard(cardName: 'Task name', time: '22.10 Die 11:00-12:00'),
-        ),
+      body: const Center(
+        child: TaskCardList(cards: [
+          TaskCard(), TaskCard(), TaskCard(),
+        ]),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Placeholder
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
 }
 
+class TaskCardList extends StatelessWidget {
+  final List<TaskCard> cards;
 
-
-
-class _SampleCard extends StatelessWidget {
-  const _SampleCard({required this.cardName, required this.time});
-
-  final String cardName;
-  final String time;
+  const TaskCardList({super.key, required this.cards});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: SizedBox(
-            width: 300,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Checkbox( //Korekt positionieren
-                  value: false, 
-                  onChanged: (bool? newValue) {
-                    //Onchange logik einbauen
-                  },
-                ),
-                Text(
-                  cardName,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+    return ListView.builder(
+      itemCount: cards.length,
+      itemBuilder: (context, index) {
+        return cards[index];
+      },
+    );
+  }
+}
+
+class TaskCard extends StatefulWidget {
+  const TaskCard({super.key});
+
+  @override
+  _TaskCardState createState() => _TaskCardState();
+}
+
+class _TaskCardState extends State<TaskCard> {
+  bool isChecked = false;
+
+  // Colors for "unchecked and late", "in Progress", "Checked", "Not started"
+  final List<Color> stateColors = [
+    const Color.fromARGB(255, 255, 72, 16), // Unchecked and late color
+    const Color.fromARGB(255, 236, 184, 10), // In Progress color
+    Colors.green,                      // Checked color
+    const Color.fromARGB(255, 107, 107, 107) // Not started color
+  ];
+
+  // TaskCard Widget made up of 2 separate Cards. Top is Rounded at the Top, Bottom is Rounded at the Bottom.
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min, 
+        children: [
+          Card(
+            color: isChecked ? stateColors[2] : stateColors[0], // TODO: Once you can check for wether or not the task is late: change color to "In Progress" or "Not Started" depending on State
+            margin: const EdgeInsets.only(bottom: 0), 
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            child: Container(
+              width: 300,
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Task Name',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Checkbox(
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isChecked = value ?? false;
+                      });
+                    },
+                    checkColor: stateColors[2], // Check mark color
+                    fillColor: MaterialStateProperty.resolveWith((states) {
+                      // Sets the fill color based on checked state
+                      if (states.contains(MaterialState.selected)) {
+                        return Colors.white; // Checked state color
+                      }
+                      return Colors.transparent; // Unchecked state color
+                    }),
+                    side: const BorderSide(color: Colors.white, width: 3.0), // White border when unchecked
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        Divider(
-          color: Color.fromARGB(255, 184, 184, 184), 
-          thickness: 2, 
-        ),
-        Container(
-          width: 300,
-          height: 50, 
-          alignment: Alignment.center, 
-          child: Text(
-            time,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
+          Card(
+            color: Colors.white,
+            margin: const EdgeInsets.only(top: 0, bottom: 10), // Zero margin only at the top
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
+            ),
+            child: Container(
+              width: 300,
+              height: 50,
+              alignment: Alignment.center,
+              child: Text(
+                '22.10 Die 14:00-15:00',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
