@@ -1,8 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class Createedittask extends StatelessWidget{
-  const Createedittask({Key? key}) : super(key: key);
+class Createedittask extends StatefulWidget{
+  const Createedittask({super.key});
+  @override
+  State<Createedittask> createState() => _CreateedittaskState();
+}
+class _CreateedittaskState extends State<Createedittask> {
+  final TextEditingController taskNameController = TextEditingController();
+  final TextEditingController taskDescriptionController =
+      TextEditingController();
+  final TextEditingController selectedDateController = TextEditingController();
+  final TextEditingController startTimeController = TextEditingController();
+  final TextEditingController endTimeController = TextEditingController();
+
+  void saveTask() {
+    if (taskNameController.text.isEmpty) {
+      print("Task name is empty");
+      return;
+    }
+
+    DateTime? selDate;
+    try {
+      selDate = selectedDateController.text.isEmpty
+          ? null
+          : DateFormat('yyyy-MM-dd').parseStrict(selectedDateController.text);
+    } catch (e) {
+      print("Invalid date format. Use yyyy-MM-dd");
+      return;
+    }
+
+    if (selDate != null) {
+      if (selDate.isBefore(DateTime.now())) {
+        print("Selected date is before current date");
+        return;
+      }
+    }
+
+     TimeOfDay? startTime;
+  try {
+    startTime = startTimeController.text.isEmpty
+        ? null
+        : TimeOfDay.fromDateTime(
+            DateFormat('hh:mm a').parseStrict(startTimeController.text));
+  } catch (e) {
+    print("Invalid start time format. Use hh:mm a");
+    return;
+  }
+
+  TimeOfDay? endTime;
+  try {
+    endTime = endTimeController.text.isEmpty
+        ? null
+        : TimeOfDay.fromDateTime(
+            DateFormat('hh:mm a').parseStrict(endTimeController.text));
+  } catch (e) {
+    print("Invalid end time format. Use hh:mm a");
+    return;
+  }
+  
+  if (startTime != null && endTime != null &&
+      (startTime.hour >= endTime.hour ||
+      (startTime.hour == endTime.hour && startTime.minute >= endTime.minute))) {
+        print("Start time is after or equal to end time");
+        return;
+      }
+
+    // Save the task
+    print('Task Name: ${taskNameController.text}');
+  print('Task Description: ${taskDescriptionController.text}');
+  print('Date: $selDate');
+  print('Start Time: ${startTime != null ? '${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}' : ''}');
+  print('End Time: ${endTime != null ? '${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}' : ''}');
+}
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -10,31 +81,44 @@ class Createedittask extends StatelessWidget{
         appBar: AppBar(
           title: const Text('Create/Edit Task'),
         ),
-        body: const SingleChildScrollView(
+        body: SingleChildScrollView(
           child: Center(
             child: Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: TaskTextField(
-                      labelText: "Enter task name", widthMultiplyer: 2),
+                    labelText: "Enter task name",
+                    widthMultiplyer: 2,
+                    controller: taskNameController,
+                    maxInputLength: 20,
+                  ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: TaskTextField(
-                      labelText: "Enter task description", widthMultiplyer: 2),
+                    labelText: "Enter task description",
+                    widthMultiplyer: 2,
+                    controller: taskDescriptionController,
+                    maxInputLength: 100,
+                  ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: SelectDate(),
+                  padding: const EdgeInsets.all(8.0),
+                  child: SelectDate(
+                    controller: selectedDateController,
+                  ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: SelectTime(),
+                  padding: const EdgeInsets.all(8.0),
+                  child: SelectTime(
+                    startTimeController: startTimeController,
+                    endTimeController: endTimeController,
+                  ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: SaveButton(),
+                  padding: const EdgeInsets.all(8.0),
+                  child: SaveButton(saveTask: saveTask),
                 ),
               ],
             ),
@@ -49,17 +133,20 @@ class TaskTextField extends StatelessWidget {
   final String labelText;
   final String? value;
   final double widthMultiplyer;
+  final TextEditingController controller;
+  final int? maxInputLength;
 
-  const TaskTextField(
-      {super.key,
-      required this.labelText,
-      required this.widthMultiplyer,
-      this.value});
+  const TaskTextField({
+    super.key,
+    required this.labelText,
+    required this.widthMultiplyer,
+    required this.controller,
+    this.maxInputLength,
+    this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController(text: value);
-
     return SizedBox(
       width: 125 * widthMultiplyer,
       child: TextField(
@@ -68,19 +155,22 @@ class TaskTextField extends StatelessWidget {
           border: const OutlineInputBorder(),
           labelText: labelText,
         ),
+        maxLength: maxInputLength,
       ),
     );
   }
 }
 
 class SelectDate extends StatefulWidget {
-  const SelectDate({super.key});
+  final TextEditingController controller;
+
+  const SelectDate({super.key, required this.controller});
 
   @override
-  State<SelectDate> createState() => _selectDateState();
+  State<SelectDate> createState() => _SelectDateState();
 }
 
-class _selectDateState extends State<SelectDate> {
+class _SelectDateState extends State<SelectDate> {
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -93,23 +183,21 @@ class _selectDateState extends State<SelectDate> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        widget.controller.text =
+            DateFormat('yyyy-MM-dd').format(_selectedDate!);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final String formattedDate = _selectedDate != null
-        ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-        : '';
-
     return Center(
       child: Stack(
         children: <Widget>[
           TaskTextField(
             labelText: 'Selected Date',
             widthMultiplyer: 2,
-            value: formattedDate,
+            controller: widget.controller,
           ),
           Positioned(
             right: 0,
@@ -126,13 +214,20 @@ class _selectDateState extends State<SelectDate> {
 }
 
 class SelectTime extends StatefulWidget {
-  const SelectTime({super.key});
+  final TextEditingController startTimeController;
+  final TextEditingController endTimeController;
+
+  const SelectTime({
+    super.key,
+    required this.startTimeController,
+    required this.endTimeController,
+  });
 
   @override
-  State<SelectTime> createState() => _selectTimeState();
+  State<SelectTime> createState() => _SelectTimeState();
 }
 
-class _selectTimeState extends State<SelectTime> {
+class _SelectTimeState extends State<SelectTime> {
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
 
@@ -145,8 +240,10 @@ class _selectTimeState extends State<SelectTime> {
       setState(() {
         if (isStartTime) {
           _startTime = picked;
+          widget.startTimeController.text = _startTime!.format(context);
         } else {
           _endTime = picked;
+          widget.endTimeController.text = _endTime!.format(context);
         }
       });
     }
@@ -169,6 +266,7 @@ class _selectTimeState extends State<SelectTime> {
                 labelText: 'Start',
                 widthMultiplyer: 1,
                 value: formattedStartTime,
+                controller: widget.startTimeController,
               ),
               Positioned(
                 right: 0,
@@ -186,6 +284,7 @@ class _selectTimeState extends State<SelectTime> {
                 labelText: 'End',
                 widthMultiplyer: 1,
                 value: formattedEndTime,
+                controller: widget.endTimeController,
               ),
               Positioned(
                 right: 0,
@@ -204,7 +303,8 @@ class _selectTimeState extends State<SelectTime> {
 }
 
 class SaveButton extends StatefulWidget {
-  const SaveButton({super.key});
+  final Function saveTask;
+  const SaveButton({super.key, required this.saveTask});
 
   @override
   State<SaveButton> createState() => _saveButtonState();
@@ -215,7 +315,7 @@ class _saveButtonState extends State<SaveButton> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Save action
+        widget.saveTask();
       },
       child: const Text('Save'),
     );
