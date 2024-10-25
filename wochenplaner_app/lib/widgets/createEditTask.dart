@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wochenplaner_app/data/Task.dart';
+import 'package:wochenplaner_app/data/taskStorage.dart';
 
-class Createedittask extends StatefulWidget{
-  const Createedittask({super.key});
+class Createedittask extends StatefulWidget {
+  final TaskManager taskManager;
+  const Createedittask({super.key, required this.taskManager});
   @override
   State<Createedittask> createState() => _CreateedittaskState();
 }
+
 class _CreateedittaskState extends State<Createedittask> {
   final TextEditingController taskNameController = TextEditingController();
   final TextEditingController taskDescriptionController =
@@ -14,9 +18,14 @@ class _CreateedittaskState extends State<Createedittask> {
   final TextEditingController startTimeController = TextEditingController();
   final TextEditingController endTimeController = TextEditingController();
 
+  Text errorText = const Text('');
+
   void saveTask() {
     if (taskNameController.text.isEmpty) {
-      print("Task name is empty");
+      setState(() {
+        errorText = const Text('Task name is empty',
+            style: TextStyle(color: Colors.red));
+      });
       return;
     }
 
@@ -26,53 +35,75 @@ class _CreateedittaskState extends State<Createedittask> {
           ? null
           : DateFormat('yyyy-MM-dd').parseStrict(selectedDateController.text);
     } catch (e) {
-      print("Invalid date format. Use yyyy-MM-dd");
+      setState(() {
+        errorText = const Text('Invalid date format. Use yyyy-MM-dd',
+            style: TextStyle(color: Colors.red));
+      });
       return;
     }
 
     if (selDate != null) {
       if (selDate.isBefore(DateTime.now())) {
-        print("Selected date is before current date");
+        setState(() {
+          errorText = const Text('Selected end date is before current date',
+              style: TextStyle(color: Colors.red));
+        });
         return;
       }
     }
 
-     TimeOfDay? startTime;
-  try {
-    startTime = startTimeController.text.isEmpty
-        ? null
-        : TimeOfDay.fromDateTime(
-            DateFormat('hh:mm a').parseStrict(startTimeController.text));
-  } catch (e) {
-    print("Invalid start time format. Use hh:mm a");
-    return;
-  }
+    TimeOfDay? startTime;
+    try {
+      startTime = startTimeController.text.isEmpty
+          ? null
+          : TimeOfDay.fromDateTime(
+              DateFormat('hh:mm a').parseStrict(startTimeController.text));
+    } catch (e) {
+      setState(() {
+        errorText = const Text('Invalid start time format. Use hh:mm a',
+            style: TextStyle(color: Colors.red));
+      });
+      return;
+    }
 
-  TimeOfDay? endTime;
-  try {
-    endTime = endTimeController.text.isEmpty
-        ? null
-        : TimeOfDay.fromDateTime(
-            DateFormat('hh:mm a').parseStrict(endTimeController.text));
-  } catch (e) {
-    print("Invalid end time format. Use hh:mm a");
-    return;
-  }
-  
-  if (startTime != null && endTime != null &&
-      (startTime.hour >= endTime.hour ||
-      (startTime.hour == endTime.hour && startTime.minute >= endTime.minute))) {
-        print("Start time is after or equal to end time");
-        return;
-      }
+    TimeOfDay? endTime;
+    try {
+      endTime = endTimeController.text.isEmpty
+          ? null
+          : TimeOfDay.fromDateTime(
+              DateFormat('hh:mm a').parseStrict(endTimeController.text));
+    } catch (e) {
+      setState(() {
+        errorText = const Text('Invalid end time format. Use hh:mm a',
+            style: TextStyle(color: Colors.red));
+      });
+      return;
+    }
 
-    // Save the task
-    print('Task Name: ${taskNameController.text}');
-  print('Task Description: ${taskDescriptionController.text}');
-  print('Date: $selDate');
-  print('Start Time: ${startTime != null ? '${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}' : ''}');
-  print('End Time: ${endTime != null ? '${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}' : ''}');
-}
+    if (startTime != null &&
+        endTime != null &&
+        (startTime.hour >= endTime.hour ||
+            (startTime.hour == endTime.hour &&
+                startTime.minute >= endTime.minute))) {
+      setState(() {
+        errorText = const Text('Start time is after or equal to end time',
+            style: TextStyle(color: Colors.red));
+      });
+      return;
+    }
+
+    // Save the task in the database
+    Task newTask = Task(
+      id: widget.taskManager.getCountTasks(),
+      title: taskNameController.text,
+      description: taskDescriptionController.text,
+      taskDate: selDate,
+      startTime: startTime,
+      endTime: endTime,
+    );
+
+    widget.taskManager.addTask(newTask);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +151,7 @@ class _CreateedittaskState extends State<Createedittask> {
                   padding: const EdgeInsets.all(8.0),
                   child: SaveButton(saveTask: saveTask),
                 ),
+                errorText,
               ],
             ),
           ),

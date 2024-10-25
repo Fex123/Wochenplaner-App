@@ -1,28 +1,31 @@
+import 'package:flutter/material.dart';
+
 import 'taskStorage.dart';
 
 class Task {
-
   //obvious attributes
-  
+
   String title;
-  String description;
-  //To-Do: Add start and end date
+  String? description = '';
+  DateTime? taskDate;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
+
   //To-Do: Add options for pictures and memory
 
   //internal attributes
 
   late int id;
-  bool isCompleted;
+  bool isCompleted = false;
 
   Task({
-      required this.title,
-      required this.description,
-      //required this.startDate,
-      //required this.endDate,
-      required this.isCompleted,
-  }) {
-    id = TaskManager().tasks.length;
-  }
+    required this.id,
+    required this.title,
+    this.description,
+    this.taskDate,
+    this.startTime,
+    this.endTime,
+  });
 
   void changeTaskState() {
     isCompleted = !isCompleted;
@@ -44,10 +47,10 @@ class Task {
     description = newDescription;
   }
 
-  String getTaskDescription() {
+  String? getTaskDescription() {
     return description;
   }
 
-  //To-Do: Add a function to set the start and end date
+  //To-Do: Add a function to set the start and end date/time
   //To-Do: Add a function to set the picture and memory
 }

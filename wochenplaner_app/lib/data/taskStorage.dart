@@ -1,14 +1,23 @@
 import '../../data/Task.dart';
 
-class TaskManager{
+class TaskManager {
   List<Task> tasks = [];
-  void addTask(Task task){
+  late int countTasks = 0;
+  void addTask(Task task) {
     tasks.add(task);
+    countTasks++;
   }
-  void removeTask(Task task){
+
+  void removeTask(Task task) {
     tasks.remove(task);
+    countTasks--;
   }
-  void updateTask(Task task){
+
+  void updateTask(Task task) {
     tasks[tasks.indexWhere((element) => element.id == task.id)] = task;
+  }
+
+  int getCountTasks() {
+    return countTasks;
   }
 }
