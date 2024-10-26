@@ -22,14 +22,14 @@ class MyApp extends StatelessWidget {
             255, 212, 197, 197), // Set dark background color
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page', taskManager: taskManager),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
+  const MyHomePage({super.key, required this.title, required this.taskManager});
+  final TaskManager taskManager;
   final String title;
 
   @override
@@ -39,9 +39,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: Tasklistview(),
+        child: Tasklistview(taskManager: widget.taskManager),
       ),
     );
   }

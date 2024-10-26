@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:wochenplaner_app/data/taskStorage.dart';
+import 'package:wochenplaner_app/widgets/createEditTask.dart';
 
 class Tasklistview extends StatelessWidget {
-  const Tasklistview({super.key});
+  const Tasklistview({super.key, required this.taskManager});
+
+  final TaskManager taskManager;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +17,7 @@ class Tasklistview extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Placeholder
+          Createedittask(taskManager: taskManager);
         },
         child: Icon(Icons.add),
       ),
@@ -44,6 +48,8 @@ class TaskCard extends StatefulWidget {
   _TaskCardState createState() => _TaskCardState();
 }
 
+//TODO: When Date is empty, remove date card and make radius full
+
 class _TaskCardState extends State<TaskCard> {
   bool isChecked = false;
 
@@ -65,8 +71,8 @@ class _TaskCardState extends State<TaskCard> {
           Card(
             color: isChecked ? stateColors[2] : stateColors[0], // TODO: Once you can check for wether or not the task is late: change color to "In Progress" or "Not Started" depending on State
             margin: const EdgeInsets.only(bottom: 0), 
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
+            shape: const RoundedRectangleBorder(
+              borderRadius:  BorderRadius.vertical(
                 top: Radius.circular(20),
               ),
             ),
@@ -78,7 +84,7 @@ class _TaskCardState extends State<TaskCard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Task Name',
                     style: TextStyle(
                       fontSize: 20,
@@ -95,9 +101,9 @@ class _TaskCardState extends State<TaskCard> {
                       });
                     },
                     checkColor: stateColors[2], // Check mark color
-                    fillColor: MaterialStateProperty.resolveWith((states) {
+                    fillColor: WidgetStateProperty.resolveWith((states) {
                       // Sets the fill color based on checked state
-                      if (states.contains(MaterialState.selected)) {
+                      if (states.contains(WidgetState.selected)) {
                         return Colors.white; // Checked state color
                       }
                       return Colors.transparent; // Unchecked state color
@@ -111,7 +117,7 @@ class _TaskCardState extends State<TaskCard> {
           Card(
             color: Colors.white,
             margin: const EdgeInsets.only(top: 0, bottom: 10), // Zero margin only at the top
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(20),
               ),
@@ -120,7 +126,7 @@ class _TaskCardState extends State<TaskCard> {
               width: 300,
               height: 50,
               alignment: Alignment.center,
-              child: Text(
+              child: const Text(
                 '22.10 Die 14:00-15:00',
                 style: TextStyle(
                   fontSize: 16,
