@@ -102,7 +102,8 @@ class _CreateedittaskState extends State<Createedittask> {
       endTime: endTime,
     );
 
-    widget.taskManager.addTask(newTask);
+    Navigator.pop(context, newTask);
+
   }
 
   @override

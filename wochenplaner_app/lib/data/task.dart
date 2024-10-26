@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'taskStorage.dart';
-
 class Task {
   //obvious attributes
 

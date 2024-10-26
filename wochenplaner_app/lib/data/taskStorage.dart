@@ -17,6 +17,10 @@ class TaskManager {
     tasks[tasks.indexWhere((element) => element.id == task.id)] = task;
   }
 
+  List<Task> getTasks() {
+    return tasks;
+  }
+
   int getCountTasks() {
     return countTasks;
   }

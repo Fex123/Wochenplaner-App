@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Wochenplaner',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         scaffoldBackgroundColor: const Color.fromARGB(
@@ -37,11 +37,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedId = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedId = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Tasklistview(taskManager: widget.taskManager),
+      body:
+      Center(
+        child: _selectedId == 0? 
+        Tasklistview(taskManager: widget.taskManager) :
+        Container()
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.list_rounded),
+              onPressed: () {
+                _onItemTapped(0);
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.calendar_today),
+              onPressed: () {
+                _onItemTapped(1);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
