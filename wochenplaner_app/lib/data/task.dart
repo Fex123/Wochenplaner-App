@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
-
 class Task {
   //obvious attributes
 
   String title;
   String? description = '';
   DateTime? taskDate;
-  TimeOfDay? startTime;
-  TimeOfDay? endTime;
+  DateTime? startTime;
+  DateTime? endTime;
 
   //To-Do: Add options for pictures and memory
 

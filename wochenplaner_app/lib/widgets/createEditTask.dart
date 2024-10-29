@@ -52,58 +52,81 @@ class _CreateedittaskState extends State<Createedittask> {
       }
     }
 
-    TimeOfDay? startTime;
+    DateTime? _startTime;
+  try {
+    _startTime = startTimeController.text.isEmpty
+        ? null
+        : DateFormat('hh:mm a').parseStrict(startTimeController.text);
+  } catch (e) {
     try {
-      startTime = startTimeController.text.isEmpty
+      _startTime = startTimeController.text.isEmpty
           ? null
-          : TimeOfDay.fromDateTime(
-              DateFormat('hh:mm a').parseStrict(startTimeController.text));
+          : DateFormat('HH:mm').parseStrict(startTimeController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid start time format. Use hh:mm a',
+        errorText = const Text('Invalid start time format. Use hh:mm a or HH:mm',
             style: TextStyle(color: Colors.red));
       });
       return;
     }
+  }
 
-    TimeOfDay? endTime;
+  DateTime? _endTime;
+  try {
+    _endTime = endTimeController.text.isEmpty
+        ? null
+        : DateFormat('hh:mm a').parseStrict(endTimeController.text);
+  } catch (e) {
     try {
-      endTime = endTimeController.text.isEmpty
+      _endTime = endTimeController.text.isEmpty
           ? null
-          : TimeOfDay.fromDateTime(
-              DateFormat('hh:mm a').parseStrict(endTimeController.text));
+          : DateFormat('HH:mm').parseStrict(endTimeController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid end time format. Use hh:mm a',
+        errorText = const Text('Invalid end time format. Use hh:mm a or HH:mm',
             style: TextStyle(color: Colors.red));
       });
       return;
     }
+  }
 
-    if (startTime != null &&
-        endTime != null &&
-        (startTime.hour >= endTime.hour ||
-            (startTime.hour == endTime.hour &&
-                startTime.minute >= endTime.minute))) {
-      setState(() {
-        errorText = const Text('Start time is after or equal to end time',
-            style: TextStyle(color: Colors.red));
-      });
-      return;
-    }
+    if (_startTime != null &&
+      _endTime != null &&
+      (_startTime.hour > _endTime.hour ||
+          (_startTime.hour == _endTime.hour &&
+              _startTime.minute >= _endTime.minute))) {
+    setState(() {
+      errorText = const Text('Start time is after or equal to end time',
+          style: TextStyle(color: Colors.red));
+    });
+    return;
+  }
 
+  //final dateFormat = DateFormat('yyyy-MM-dd');
+  //final startDateTime = DateTime(2024, 12, 12, 03, 30);
+  //final endDateTime = DateTime(2024, 12, 12, 12, 30);
+
+  //final startTime24 = DateFormat('HH:mm').format(startDateTime);
+  //final startTimeAMPM = DateFormat('hh:mm a').format(startDateTime);
+  //final endTime24 = DateFormat('HH:mm').format(endDateTime);
+  //final endTimeAMPM = DateFormat('hh:mm a').format(endDateTime);
+
+  //print('${dateFormat.format(startDateTime)}\n$startTime24 ($startTimeAMPM) - $endTime24 ($endTimeAMPM)');
+
+
+  if (_startTime != null && _endTime != null) {
     // Save the task in the database
     Task newTask = Task(
       id: widget.taskManager.getCountTasks(),
       title: taskNameController.text,
       description: taskDescriptionController.text,
       taskDate: selDate,
-      startTime: startTime,
-      endTime: endTime,
+      startTime: _startTime,
+      endTime: _endTime,
     );
 
     Navigator.pop(context, newTask);
-
+  }
   }
 
   @override

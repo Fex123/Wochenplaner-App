@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
+import 'package:wochenplaner_app/widgets/clandarView.dart';
 import 'package:wochenplaner_app/widgets/taskListView.dart';
 
 void main() {
@@ -50,9 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body:
       Center(
-        child: _selectedId == 0? 
-        Tasklistview(taskManager: widget.taskManager) :
-        Container()
+        child: _selectedId == 0
+        ? Tasklistview(taskManager: widget.taskManager) 
+        : _selectedId == 1
+          ? CalendarView(taskManager: widget.taskManager,)
+          : Container()
       ),
       bottomNavigationBar: BottomAppBar(
         child: Row(

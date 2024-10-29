@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
@@ -105,6 +106,21 @@ class TaskCard extends StatefulWidget {
 
 class _TaskCardState extends State<TaskCard> {
   bool isChecked = false;
+
+ String formatDate() {
+  final dateFormat = DateFormat('yyyy-MM-dd');
+  return dateFormat.format(widget.task.taskDate!);
+}
+
+String formatTime(bool isStartTime) {
+  final timeFormat = MediaQuery.of(context).alwaysUse24HourFormat ? 'HH:mm' : 'hh:mm a';
+  final dateFormat = DateFormat(timeFormat);
+  if (isStartTime) {
+    return dateFormat.format(widget.task.startTime!);
+  } else {
+    return dateFormat.format(widget.task.endTime!);
+  }
+}
 
   // Colors for "unchecked and late", "in Progress", "Checked", "Not started"
   final List<Color> stateColors = [
@@ -231,7 +247,9 @@ class _TaskCardState extends State<TaskCard> {
                 height: 50,
                 alignment: Alignment.center,
                 child: Text(
-                  '${widget.task.taskDate!} ${widget.task.startTime!}-${widget.task.endTime!}',
+                  '${
+                    formatDate()}\n${formatTime(true)} - ${formatTime(false)
+                    }',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black,
