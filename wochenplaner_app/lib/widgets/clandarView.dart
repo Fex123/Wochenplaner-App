@@ -119,26 +119,49 @@ class _CalendarView extends State<CalendarView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                event.title,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    event.title,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.pop(context); // Schließt das Bottom Sheet
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
+              const Divider(), // Trennlinie
               Text(
-                event.description ?? 'No description',
+                event.description == '' ? 'Diese Task hat keine Beschreibung.' : event.description!,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
+              const Divider(), // Trennlinie
               if (event.date != null)
                 Text(
-                  'Date: ${DateFormat.yMMMd().format(event.date)}',
+                  'Datum: ${DateFormat.yMMMd().format(event.date)}',
                   style: const TextStyle(fontSize: 16),
                 ),
               if (event.startTime != null && event.endTime != null)
                 Text(
-                  'Time: ${DateFormat.jm().format(event.startTime!)} - ${DateFormat.jm().format(event.endTime!)}',
+                  'Zeitraum: ${DateFormat.jm().format(event.startTime!)} - ${DateFormat.jm().format(event.endTime!)}',
                   style: const TextStyle(fontSize: 16),
                 ),
+              const SizedBox(height: 16),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // EDIT Task
+                    Navigator.pop(context); // Schließt das Bottom Sheet
+                  },
+                  child: const Text('bearbeiten'),
+                ),
+              ),
             ],
           ),
         );
