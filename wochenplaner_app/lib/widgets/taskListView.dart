@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wochenplaner_app/staticAppVariables.dart';
 import '../../data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
+
 
 class Tasklistview extends StatefulWidget {
   const Tasklistview({super.key, required this.taskManager});
@@ -17,6 +19,9 @@ class _tasklistview extends State<Tasklistview> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: const Text('Task Liste'),
+        ),
       body: Center(
         child: TaskCardList(taskManager: widget.taskManager),
       ),
@@ -124,10 +129,10 @@ String formatTime(bool isStartTime) {
 
   // Colors for "unchecked and late", "in Progress", "Checked", "Not started"
   final List<Color> stateColors = [
-    const Color.fromARGB(255, 255, 72, 16), // Unchecked and late color
-    const Color.fromARGB(255, 236, 184, 10), // In Progress color
-    Colors.green, // Checked color
-    const Color.fromARGB(255, 107, 107, 107) // Not started color
+    AppColors.uncheckedLate, // Unchecked and late color
+    AppColors.inProgress, // In Progress color
+    AppColors.checked, // Checked color
+    AppColors.notStarted // Not started color
   ];
 
   bool isTaskLate(Task task) {
@@ -164,10 +169,76 @@ String formatTime(bool isStartTime) {
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
   }
 
+  
+  void _showTaskDetails(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          width: double.infinity, // Füllt die gesamte Breite des Bildschirms
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.task.title,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.pop(context); // Schließt das Bottom Sheet
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Divider(), // Trennlinie
+              Text(
+                //TODO: dont work, why?
+                (widget.task.description == '' ? 'Diese Task hat keine Beschreibung.' : widget.task.description)!,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              const Divider(), // Trennlinie
+              if (widget.task.taskDate != null)
+                Text(
+                  'Datum: ${DateFormat.yMMMd().format(widget.task.taskDate!)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              if (widget.task.startTime != null && widget.task.endTime != null)
+                Text(
+                  // TODO: Fix time format ODER Schau auf Felix' handy: vlt wirds dort richtig angezeigt? Ist ja einstellungs abhängig
+                  'Zeitraum: ${DateFormat.jm().format(widget.task.startTime!)} - ${DateFormat.jm().format(widget.task.endTime!)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              const SizedBox(height: 16),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // EDIT Task
+                    Navigator.pop(context); // Schließt das Bottom Sheet
+                  },
+                  child: const Text('bearbeiten'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   // TaskCard Widget made up of 2 separate Cards. Top is Rounded at the Top, Bottom is Rounded at the Bottom.
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return GestureDetector(
+      onTap: () => _showTaskDetails(context),
+      child: Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -184,9 +255,9 @@ String formatTime(bool isStartTime) {
                 : const EdgeInsets.only(bottom: 0, top: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20),
+                top: const Radius.circular(20),
                 bottom: widget.task.taskDate == null || widget.task.startTime == null || widget.task.endTime  == null
-                    ? Radius.circular(20)
+                    ? const Radius.circular(20)
                     : Radius.zero,
               ),
             ),
@@ -260,6 +331,7 @@ String formatTime(bool isStartTime) {
             ),
         ],
       ),
+    )
     );
   }
 }

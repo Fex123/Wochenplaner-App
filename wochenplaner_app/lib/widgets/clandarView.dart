@@ -1,7 +1,9 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
+import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
 
 class CalendarView extends StatefulWidget {
@@ -23,8 +25,13 @@ class _CalendarView extends State<CalendarView> {
         appBar: AppBar(
           title: const Text('Kalenderansicht'),
         ),
-        body: 
-        const WeekView(),
+        body: WeekView(
+          onEventTap: (events, date) {
+            if (events.isNotEmpty) {
+              _showTaskDetails(context, events.first);
+            }
+          },
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             Task newtask = await Navigator.push(
@@ -53,7 +60,89 @@ class _CalendarView extends State<CalendarView> {
         description: task.description,
         startTime: task.startTime,
         endTime: task.endTime,
+        color: _getTaskColor(task), // Setze die Farbe basierend auf dem Abschlussstatus
       );
     }).toList();
+  }
+
+  Color _getTaskColor(Task task) {
+    if (task.isCompleted) {
+      return AppColors.checked;
+    } else if (isTaskLate(task)) {
+      return AppColors.uncheckedLate;
+    } else if (isTaskInProgress(task)) {
+      return AppColors.inProgress;
+    } else {
+      return AppColors.notStarted;
+    }
+  }
+
+  bool isTaskLate(Task task) {
+    final now = DateTime.now();
+    final taskEndTime = DateTime(
+      task.taskDate!.year,
+      task.taskDate!.month,
+      task.taskDate!.day,
+      task.endTime!.hour,
+      task.endTime!.minute,
+    );
+    return now.isAfter(taskEndTime);
+  }
+
+  bool isTaskInProgress(Task task) {
+    final now = DateTime.now();
+    final taskStartTime = DateTime(
+      task.taskDate!.year,
+      task.taskDate!.month,
+      task.taskDate!.day,
+      task.startTime!.hour,
+      task.startTime!.minute,
+    );
+    final taskEndTime = DateTime(
+      task.taskDate!.year,
+      task.taskDate!.month,
+      task.taskDate!.day,
+      task.endTime!.hour,
+      task.endTime!.minute,
+    );
+    return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
+  }
+
+  void _showTaskDetails(BuildContext context, CalendarEventData event) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          width: double.infinity, // Füllt die gesamte Breite des Bildschirms
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                event.title,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                event.description ?? 'No description',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              if (event.date != null)
+                Text(
+                  'Date: ${DateFormat.yMMMd().format(event.date)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              if (event.startTime != null && event.endTime != null)
+                Text(
+                  'Time: ${DateFormat.jm().format(event.startTime!)} - ${DateFormat.jm().format(event.endTime!)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
