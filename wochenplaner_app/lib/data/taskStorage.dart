@@ -10,7 +10,6 @@ class TaskManager {
 
   void removeTask(Task task) {
     tasks.remove(task);
-    countTasks--;
   }
 
   void updateTask(Task task) {

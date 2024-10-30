@@ -43,9 +43,11 @@ class _CreateedittaskState extends State<Createedittask> {
     }
 
     if (selDate != null) {
-      if (selDate.isBefore(DateTime.now())) {
+      DateTime now = DateTime.now();
+      DateTime today = DateTime(now.year, now.month, now.day);
+      if (selDate.isBefore(today)) {
         setState(() {
-          errorText = const Text('Selected end date is before current date',
+          errorText = const Text('Selected date is before current date',
               style: TextStyle(color: Colors.red));
         });
         return;
@@ -102,20 +104,7 @@ class _CreateedittaskState extends State<Createedittask> {
     return;
   }
 
-  //final dateFormat = DateFormat('yyyy-MM-dd');
-  //final startDateTime = DateTime(2024, 12, 12, 03, 30);
-  //final endDateTime = DateTime(2024, 12, 12, 12, 30);
-
-  //final startTime24 = DateFormat('HH:mm').format(startDateTime);
-  //final startTimeAMPM = DateFormat('hh:mm a').format(startDateTime);
-  //final endTime24 = DateFormat('HH:mm').format(endDateTime);
-  //final endTimeAMPM = DateFormat('hh:mm a').format(endDateTime);
-
-  //print('${dateFormat.format(startDateTime)}\n$startTime24 ($startTimeAMPM) - $endTime24 ($endTimeAMPM)');
-
-
   if (_startTime != null && _endTime != null) {
-    // Save the task in the database
     Task newTask = Task(
       id: widget.taskManager.getCountTasks(),
       title: taskNameController.text,
@@ -125,6 +114,13 @@ class _CreateedittaskState extends State<Createedittask> {
       endTime: _endTime,
     );
 
+    Navigator.pop(context, newTask);
+  }else{
+    Task newTask = Task(
+      id: widget.taskManager.getCountTasks(),
+      title: taskNameController.text,
+      description: taskDescriptionController.text,
+    );
     Navigator.pop(context, newTask);
   }
   }
@@ -171,9 +167,19 @@ class _CreateedittaskState extends State<Createedittask> {
                     endTimeController: endTimeController,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SaveButton(saveTask: saveTask),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CancelButton(
+                        onPressed: () {
+                          Navigator.pop(context, null);
+                        },
+                      ),
+                      const SizedBox(width: 16), // Abstand zwischen den Buttons
+                      SaveButton(saveTask: saveTask),
+                    ],
+                  ),
                 ),
                 errorText,
               ],
@@ -374,6 +380,20 @@ class _saveButtonState extends State<SaveButton> {
         widget.saveTask();
       },
       child: const Text('Save'),
+    );
+  }
+}
+
+class CancelButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const CancelButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: const Text('Cancel'),
     );
   }
 }

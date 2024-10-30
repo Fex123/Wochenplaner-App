@@ -53,14 +53,16 @@ class _CalendarView extends State<CalendarView> {
   }
 
   List<CalendarEventData> _convertTasksToEvents(TaskManager taskManager) {
-    return taskManager.getTasks().map((task) {
+    return taskManager.getTasks().where((task) {
+      return task.taskDate != null && task.startTime != null && task.endTime != null;
+    }).map((task) {
       return CalendarEventData(
         date: task.taskDate!,
         title: task.title,
         description: task.description,
-        startTime: task.startTime,
-        endTime: task.endTime,
-        color: _getTaskColor(task), // Setze die Farbe basierend auf dem Abschlussstatus
+        startTime: task.startTime!,
+        endTime: task.endTime!,
+        color: _getTaskColor(task),
       );
     }).toList();
   }
@@ -119,49 +121,26 @@ class _CalendarView extends State<CalendarView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    event.title,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      Navigator.pop(context); // Schließt das Bottom Sheet
-                    },
-                  ),
-                ],
+              Text(
+                event.title,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Divider(), // Trennlinie
               Text(
-                event.description == '' ? 'Diese Task hat keine Beschreibung.' : event.description!,
+                event.description ?? 'No description',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
-              const Divider(), // Trennlinie
               if (event.date != null)
                 Text(
-                  'Datum: ${DateFormat.yMMMd().format(event.date)}',
+                  'Date: ${DateFormat.yMMMd().format(event.date)}',
                   style: const TextStyle(fontSize: 16),
                 ),
               if (event.startTime != null && event.endTime != null)
                 Text(
-                  'Zeitraum: ${DateFormat.jm().format(event.startTime!)} - ${DateFormat.jm().format(event.endTime!)}',
+                  'Time: ${DateFormat.jm().format(event.startTime!)} - ${DateFormat.jm().format(event.endTime!)}',
                   style: const TextStyle(fontSize: 16),
                 ),
-              const SizedBox(height: 16),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // EDIT Task
-                    Navigator.pop(context); // Schließt das Bottom Sheet
-                  },
-                  child: const Text('bearbeiten'),
-                ),
-              ),
             ],
           ),
         );
