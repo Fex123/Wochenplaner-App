@@ -36,8 +36,8 @@ class _tasklistview extends State<Tasklistview> {
           );
           if (newtask != null) {
             setState(() {
-        widget.taskManager.addTask(newtask);
-      });
+              widget.taskManager.addTask(newtask);
+            });
           }
         },
         child: const Icon(Icons.add),
@@ -79,58 +79,39 @@ class _TaskCardListState extends State<TaskCardList> {
           task: tasks[index],
           taskManager: widget.taskManager,
           onTaskRemoved: refreshTasks,
+          onTaskUpdated: refreshTasks, // Add this callback
         );
       },
     );
   }
 }
 
-bool isTaskLate(Task task) {
-  final now = DateTime.now();
-  final taskEndTime = DateTime(
-    task.taskDate!.year,
-    task.taskDate!.month,
-    task.taskDate!.day,
-    task.endTime!.hour,
-    task.endTime!.minute,
-  );
-  return now.isAfter(taskEndTime);
-}
-
-bool isTaskInProgress(Task task) {
-  final now = DateTime.now();
-  final taskStartTime = DateTime(
-    task.taskDate!.year,
-    task.taskDate!.month,
-    task.taskDate!.day,
-    task.startTime!.hour,
-    task.startTime!.minute,
-  );
-  final taskEndTime = DateTime(
-    task.taskDate!.year,
-    task.taskDate!.month,
-    task.taskDate!.day,
-    task.endTime!.hour,
-    task.endTime!.minute,
-  );
-  return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
-}
-
 class TaskCard extends StatefulWidget {
-  const TaskCard({super.key, required this.task, required this.taskManager, required this.onTaskRemoved});
+  const TaskCard({
+    super.key,
+    required this.task,
+    required this.taskManager,
+    required this.onTaskRemoved,
+    required this.onTaskUpdated, // Add this parameter
+  });
 
   final Task task;
   final TaskManager taskManager;
   final VoidCallback onTaskRemoved;
+  final VoidCallback onTaskUpdated; // Add this parameter
 
   @override
   _TaskCardState createState() => _TaskCardState();
 }
 
-//TODO: When Date is empty, remove date card and make radius full
-
 class _TaskCardState extends State<TaskCard> {
-  bool isChecked = false;
+  late bool isChecked;
+
+  @override
+  void initState() {
+    super.initState();
+    isChecked = widget.task.isCompleted;
+  }
 
   String formatDate() {
     final dateFormat = DateFormat('yyyy-MM-dd');
@@ -220,7 +201,6 @@ class _TaskCardState extends State<TaskCard> {
               const SizedBox(height: 8),
               const Divider(), // Trennlinie
               Text(
-                //TODO: dont work, why?
                 (widget.task.description == ''
                     ? 'Diese Task hat keine Beschreibung.'
                     : widget.task.description)!,
@@ -235,7 +215,6 @@ class _TaskCardState extends State<TaskCard> {
                 ),
               if (widget.task.startTime != null && widget.task.endTime != null)
                 Text(
-                  // TODO: Fix time format ODER Schau auf Felix' handy: vlt wirds dort richtig angezeigt? Ist ja einstellungs abhängig
                   'Zeitraum: ${DateFormat.jm().format(widget.task.startTime!)} - ${DateFormat.jm().format(widget.task.endTime!)}',
                   style: const TextStyle(fontSize: 16),
                 ),
@@ -245,9 +224,25 @@ class _TaskCardState extends State<TaskCard> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        // EDIT Task
-                        Navigator.pop(context); // Schließt das Bottom Sheet
+                      onPressed: () async {
+                        Task? newtask = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Createedittask(
+                              taskManager: widget.taskManager,
+                              taskToEdit: widget.task,
+                            ),
+                          ),
+                        );
+
+                        if (newtask != null) {
+                          setState(() {
+                            widget.taskManager.updateTask(newtask);
+                            widget.onTaskUpdated(); // Refresh the task list
+                          });
+                        }
+
+                        Navigator.pop(context);
                       },
                       child: const Text('bearbeiten'),
                     ),
@@ -324,6 +319,9 @@ class _TaskCardState extends State<TaskCard> {
                         onChanged: (bool? value) {
                           setState(() {
                             isChecked = value ?? false;
+                            widget.task.changeTaskState();
+                            widget.taskManager.updateTask(widget.task);
+                            widget.onTaskUpdated(); // Refresh the task list
                           });
                         },
                         checkColor: stateColors[2], // Check mark color
@@ -359,7 +357,7 @@ class _TaskCardState extends State<TaskCard> {
                     height: 50,
                     alignment: Alignment.center,
                     child: Text(
-                      '${formatDate()}\n${formatTime(true)} - ${formatTime(false)}',
+                      '${DateFormat.yMMMd().format(widget.task.taskDate!)}\n${formatTime(true)} - ${formatTime(false)}',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black,

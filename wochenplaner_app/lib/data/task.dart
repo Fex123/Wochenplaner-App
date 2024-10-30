@@ -49,4 +49,23 @@ class Task {
 
   //To-Do: Add a function to set the start and end date/time
   //To-Do: Add a function to set the picture and memory
+
+  Task copyWith({
+    int? id,
+    String? title,
+    String? description,
+    DateTime? taskDate,
+    DateTime? startTime,
+    DateTime? endTime,
+    bool? isCompleted,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      taskDate: taskDate ?? this.taskDate,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+    )..isCompleted = isCompleted ?? this.isCompleted;
+  }
 }

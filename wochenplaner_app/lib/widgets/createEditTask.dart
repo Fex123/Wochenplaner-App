@@ -5,7 +5,9 @@ import 'package:wochenplaner_app/data/taskStorage.dart';
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
-  const Createedittask({super.key, required this.taskManager});
+  final Task? taskToEdit;
+
+  const Createedittask({super.key, required this.taskManager, this.taskToEdit});
   @override
   State<Createedittask> createState() => _CreateedittaskState();
 }
@@ -19,6 +21,27 @@ class _CreateedittaskState extends State<Createedittask> {
   final TextEditingController endTimeController = TextEditingController();
 
   Text errorText = const Text('');
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.taskToEdit != null) {
+      taskNameController.text = widget.taskToEdit!.title;
+      taskDescriptionController.text = widget.taskToEdit!.description ?? '';
+      if (widget.taskToEdit!.taskDate != null) {
+        selectedDateController.text =
+            DateFormat('yyyy-MM-dd').format(widget.taskToEdit!.taskDate!);
+      }
+      if (widget.taskToEdit!.startTime != null) {
+        startTimeController.text =
+            DateFormat('HH:mm').format(widget.taskToEdit!.startTime!);
+      }
+      if (widget.taskToEdit!.endTime != null) {
+        endTimeController.text =
+            DateFormat('HH:mm').format(widget.taskToEdit!.endTime!);
+      }
+    }
+  }
 
   void saveTask() {
     if (taskNameController.text.isEmpty) {
@@ -55,74 +78,63 @@ class _CreateedittaskState extends State<Createedittask> {
     }
 
     DateTime? _startTime;
-  try {
-    _startTime = startTimeController.text.isEmpty
-        ? null
-        : DateFormat('hh:mm a').parseStrict(startTimeController.text);
-  } catch (e) {
     try {
       _startTime = startTimeController.text.isEmpty
           ? null
           : DateFormat('HH:mm').parseStrict(startTimeController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid start time format. Use hh:mm a or HH:mm',
+        errorText = const Text('Invalid start time format. Use HH:mm',
             style: TextStyle(color: Colors.red));
       });
       return;
     }
-  }
 
-  DateTime? _endTime;
-  try {
-    _endTime = endTimeController.text.isEmpty
-        ? null
-        : DateFormat('hh:mm a').parseStrict(endTimeController.text);
-  } catch (e) {
+    DateTime? _endTime;
     try {
       _endTime = endTimeController.text.isEmpty
           ? null
           : DateFormat('HH:mm').parseStrict(endTimeController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid end time format. Use hh:mm a or HH:mm',
+        errorText = const Text('Invalid end time format. Use HH:mm',
             style: TextStyle(color: Colors.red));
       });
       return;
     }
-  }
 
     if (_startTime != null &&
-      _endTime != null &&
-      (_startTime.hour > _endTime.hour ||
-          (_startTime.hour == _endTime.hour &&
-              _startTime.minute >= _endTime.minute))) {
-    setState(() {
-      errorText = const Text('Start time is after or equal to end time',
-          style: TextStyle(color: Colors.red));
-    });
-    return;
-  }
+        _endTime != null &&
+        (_startTime.isAfter(_endTime) ||
+            _startTime.isAtSameMomentAs(_endTime))) {
+      setState(() {
+        errorText = const Text('Start time is after or equal to end time',
+            style: TextStyle(color: Colors.red));
+      });
+      return;
+    }
 
-  if (_startTime != null && _endTime != null) {
-    Task newTask = Task(
-      id: widget.taskManager.getCountTasks(),
-      title: taskNameController.text,
-      description: taskDescriptionController.text,
-      taskDate: selDate,
-      startTime: _startTime,
-      endTime: _endTime,
-    );
+    Task newTask;
+    if (widget.taskToEdit != null) {
+      newTask = widget.taskToEdit!.copyWith(
+        title: taskNameController.text,
+        description: taskDescriptionController.text,
+        taskDate: selDate,
+        startTime: _startTime,
+        endTime: _endTime,
+      );
+    } else {
+      newTask = Task(
+        id: widget.taskManager.getCountTasks(),
+        title: taskNameController.text,
+        description: taskDescriptionController.text,
+        taskDate: selDate,
+        startTime: _startTime,
+        endTime: _endTime,
+      );
+    }
 
     Navigator.pop(context, newTask);
-  }else{
-    Task newTask = Task(
-      id: widget.taskManager.getCountTasks(),
-      title: taskNameController.text,
-      description: taskDescriptionController.text,
-    );
-    Navigator.pop(context, newTask);
-  }
   }
 
   @override
@@ -173,6 +185,7 @@ class _CreateedittaskState extends State<Createedittask> {
                     children: [
                       CancelButton(
                         onPressed: () {
+                          //TODO: WHen pressing Cancel in edit mode, it pauses here
                           Navigator.pop(context, null);
                         },
                       ),
