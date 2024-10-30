@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 
 import 'package:wochenplaner_app/main.dart';
@@ -14,7 +15,7 @@ import 'package:wochenplaner_app/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(taskManager: TaskManager(),));
+    await tester.pumpWidget(MyApp(taskManager: TaskManager(), settings: Settings(),));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

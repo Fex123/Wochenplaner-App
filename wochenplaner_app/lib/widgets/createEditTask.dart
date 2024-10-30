@@ -34,11 +34,11 @@ class _CreateedittaskState extends State<Createedittask> {
       }
       if (widget.taskToEdit!.startTime != null) {
         startTimeController.text =
-            DateFormat('HH:mm').format(widget.taskToEdit!.startTime!);
+            DateFormat.jm().format(widget.taskToEdit!.startTime!);
       }
       if (widget.taskToEdit!.endTime != null) {
         endTimeController.text =
-            DateFormat('HH:mm').format(widget.taskToEdit!.endTime!);
+            DateFormat.jm().format(widget.taskToEdit!.endTime!);
       }
     }
   }
@@ -78,41 +78,42 @@ class _CreateedittaskState extends State<Createedittask> {
     }
 
     DateTime? _startTime;
+  try {
+    _startTime = startTimeController.text.isEmpty
+        ? null
+        : DateFormat('hh:mm a').parseStrict(startTimeController.text);
+  } catch (e) {
     try {
       _startTime = startTimeController.text.isEmpty
           ? null
           : DateFormat('HH:mm').parseStrict(startTimeController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid start time format. Use HH:mm',
+        errorText = const Text('Invalid start time format. Use hh:mm a or HH:mm',
             style: TextStyle(color: Colors.red));
       });
       return;
     }
+  }
 
-    DateTime? _endTime;
+  DateTime? _endTime;
+  try {
+    _endTime = endTimeController.text.isEmpty
+        ? null
+        : DateFormat('hh:mm a').parseStrict(endTimeController.text);
+  } catch (e) {
     try {
       _endTime = endTimeController.text.isEmpty
           ? null
           : DateFormat('HH:mm').parseStrict(endTimeController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid end time format. Use HH:mm',
+        errorText = const Text('Invalid end time format. Use hh:mm a or HH:mm',
             style: TextStyle(color: Colors.red));
       });
       return;
     }
-
-    if (_startTime != null &&
-        _endTime != null &&
-        (_startTime.isAfter(_endTime) ||
-            _startTime.isAtSameMomentAs(_endTime))) {
-      setState(() {
-        errorText = const Text('Start time is after or equal to end time',
-            style: TextStyle(color: Colors.red));
-      });
-      return;
-    }
+  }
 
     Task newTask;
     if (widget.taskToEdit != null) {
@@ -315,21 +316,28 @@ class _SelectTimeState extends State<SelectTime> {
       setState(() {
         if (isStartTime) {
           _startTime = picked;
-          widget.startTimeController.text = _startTime!.format(context);
+          widget.startTimeController.text = _formatTime(_startTime!);
         } else {
           _endTime = picked;
-          widget.endTimeController.text = _endTime!.format(context);
+          widget.endTimeController.text = _formatTime(_endTime!);
         }
       });
     }
   }
 
+  String _formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final format = MediaQuery.of(context).alwaysUse24HourFormat ? DateFormat('HH:mm') : DateFormat('hh:mm a');
+    return format.format(dt);
+  }
+
   @override
   Widget build(BuildContext context) {
     final String formattedStartTime =
-        _startTime != null ? _startTime!.format(context) : '';
+        _startTime != null ? _formatTime(_startTime!) : '';
     final String formattedEndTime =
-        _endTime != null ? _endTime!.format(context) : '';
+        _endTime != null ? _formatTime(_endTime!) : '';
 
     return Center(
       child: Row(

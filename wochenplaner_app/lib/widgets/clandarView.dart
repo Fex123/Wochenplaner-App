@@ -2,20 +2,24 @@ import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
+import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
 
 class CalendarView extends StatefulWidget {
   final TaskManager taskManager;
+  final Settings settings;
 
-  const CalendarView({super.key, required this.taskManager});
+  const CalendarView({super.key, required this.taskManager, required this.settings});
 
   @override
   State<CalendarView> createState() => _CalendarView();
 }
 
 class _CalendarView extends State<CalendarView> {
+  int _selectedViewIndex = 1;
+
   @override
   Widget build(BuildContext context) {
     return CalendarControllerProvider(
@@ -25,12 +29,13 @@ class _CalendarView extends State<CalendarView> {
         appBar: AppBar(
           title: const Text('Kalenderansicht'),
         ),
-        body: WeekView(
-          onEventTap: (events, date) {
-            if (events.isNotEmpty) {
-              _showTaskDetails(context, events.first);
-            }
-          },
+        body: Column(
+          children: [
+            _buildSegmentedControl(),
+            Expanded(
+              child: _buildCalendarView(widget.settings),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
@@ -52,6 +57,60 @@ class _CalendarView extends State<CalendarView> {
     );
   }
 
+  Widget _buildSegmentedControl() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SegmentedButton(
+        segments: const [
+          ButtonSegment(value: 0, label: Text('Day')),
+          ButtonSegment(value: 1, label: Text('Week')),
+          ButtonSegment(value: 2, label: Text('Month')),
+        ],
+        selected: {_selectedViewIndex},
+        onSelectionChanged: (Set<int> newSelection) {
+          setState(() {
+            _selectedViewIndex = newSelection.first;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildCalendarView(Settings settings) {
+    switch (_selectedViewIndex) {
+      case 0:
+        return DayView(
+          startHour: settings.getStartHour(),
+          endHour: settings.getEndHour(),
+          onEventTap: (events, date) {
+            if (events.isNotEmpty) {
+              _showTaskDetails(context, events.first);
+            }
+          },
+        );
+      case 1:
+        return WeekView(
+          startHour: settings.getStartHour(),
+          endHour: settings.getEndHour(),
+          onEventTap: (events, date) {
+            if (events.isNotEmpty) {
+              _showTaskDetails(context, events.first);
+            }
+          },
+        );
+      case 2:
+        return MonthView(
+          onEventTap: (events, date){
+            if(events != null){
+              _showTaskDetails(context, events);
+            }
+          }
+        );
+      default:
+        return Container();
+    }
+  }
+
   List<CalendarEventData> _convertTasksToEvents(TaskManager taskManager) {
     return taskManager.getTasks().where((task) {
       return task.taskDate != null && task.startTime != null && task.endTime != null;
@@ -63,6 +122,8 @@ class _CalendarView extends State<CalendarView> {
         startTime: task.startTime!,
         endTime: task.endTime!,
         color: _getTaskColor(task),
+        titleStyle: const TextStyle(fontSize: 15),
+        descriptionStyle: const TextStyle(fontSize: 13),
       );
     }).toList();
   }
