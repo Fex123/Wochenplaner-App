@@ -41,7 +41,7 @@ class _CalendarView extends State<CalendarView> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            Task newtask = await Navigator.push(
+            Task? newtask = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => Createedittask(
@@ -49,9 +49,10 @@ class _CalendarView extends State<CalendarView> {
                 ),
               ),
             );
+            if(newtask != null) {
             setState(() {
               widget.taskManager.addTask(newtask);
-            });
+            });}
           },
           child: const Icon(Icons.add),
         ),

@@ -119,14 +119,21 @@ class _CreateedittaskState extends State<Createedittask> {
 
     if (_startTime != null &&
         _endTime != null &&
+        !(TimeOfDay.fromDateTime(_startTime).period == DayPeriod.pm &&
+          TimeOfDay.fromDateTime(_startTime).hour == 12 &&
+          TimeOfDay.fromDateTime(_endTime).period == DayPeriod.am &&
+          TimeOfDay.fromDateTime(_endTime).hour == 0) &&
         (_startTime.hour > _endTime.hour ||
             (_startTime.hour == _endTime.hour &&
-                _startTime.minute >= _endTime.minute))) {
-      setState(() {
-        errorText = const Text('Start time is after or equal to end time',
-            style: TextStyle(color: Colors.red));
-      });
-      return;
+                _startTime.minute >= _endTime.minute) ||
+            (_endTime.hour == 0 && _endTime.minute > 0))) {
+      if (_endTime.hour != 0 && _endTime.minute != 0) {
+        setState(() {
+          errorText = const Text('Start is after or equal to end',
+              style: TextStyle(color: Colors.red));
+        });
+        return;
+      }
     }
 
     Task newTask;
@@ -154,8 +161,7 @@ class _CreateedittaskState extends State<Createedittask> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text('Create/Edit Task'),
         ),
@@ -178,7 +184,8 @@ class _CreateedittaskState extends State<Createedittask> {
                     labelText: "Enter task description",
                     widthMultiplyer: 2,
                     controller: taskDescriptionController,
-                    maxInputLength: 100,
+                    maxInputLength: 120,
+                    lines: 5,
                   ),
                 ),
                 Padding(
@@ -214,23 +221,25 @@ class _CreateedittaskState extends State<Createedittask> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
 class TaskTextField extends StatelessWidget {
   final String labelText;
   final String? value;
-  final double widthMultiplyer;
+  final double? widthMultiplyer;
   final TextEditingController controller;
+  final int? lines;
   final int? maxInputLength;
+
 
   const TaskTextField({
     super.key,
     required this.labelText,
-    required this.widthMultiplyer,
+    this.widthMultiplyer,
     required this.controller,
+    this.lines = 1,
     this.maxInputLength,
     this.value,
   });
@@ -238,7 +247,7 @@ class TaskTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 125 * widthMultiplyer,
+      width: 125 * (widthMultiplyer ?? 1),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -246,6 +255,7 @@ class TaskTextField extends StatelessWidget {
           labelText: labelText,
         ),
         maxLength: maxInputLength,
+        maxLines: lines,
       ),
     );
   }
@@ -363,7 +373,6 @@ class _SelectTimeState extends State<SelectTime> {
             children: <Widget>[
               TaskTextField(
                 labelText: 'Start',
-                widthMultiplyer: 1,
                 value: formattedStartTime,
                 controller: widget.startTimeController,
               ),
@@ -381,7 +390,6 @@ class _SelectTimeState extends State<SelectTime> {
             children: <Widget>[
               TaskTextField(
                 labelText: 'End',
-                widthMultiplyer: 1,
                 value: formattedEndTime,
                 controller: widget.endTimeController,
               ),
