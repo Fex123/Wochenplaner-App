@@ -6,12 +6,14 @@ import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
+import 'package:wochenplaner_app/widgets/taskInfoSheet.dart';
 
 class CalendarView extends StatefulWidget {
   final TaskManager taskManager;
   final Settings settings;
 
-  const CalendarView({super.key, required this.taskManager, required this.settings});
+  const CalendarView(
+      {super.key, required this.taskManager, required this.settings});
 
   @override
   State<CalendarView> createState() => _CalendarView();
@@ -99,13 +101,11 @@ class _CalendarView extends State<CalendarView> {
           },
         );
       case 2:
-        return MonthView(
-          onEventTap: (events, date){
-            if(events != null){
-              _showTaskDetails(context, events);
-            }
+        return MonthView(onEventTap: (events, date) {
+          if (events != null) {
+            _showTaskDetails(context, events);
           }
-        );
+        });
       default:
         return Container();
     }
@@ -113,7 +113,9 @@ class _CalendarView extends State<CalendarView> {
 
   List<CalendarEventData> _convertTasksToEvents(TaskManager taskManager) {
     return taskManager.getTasks().where((task) {
-      return task.taskDate != null && task.startTime != null && task.endTime != null;
+      return task.taskDate != null &&
+          task.startTime != null &&
+          task.endTime != null;
     }).map((task) {
       return CalendarEventData(
         date: task.taskDate!,
@@ -184,7 +186,8 @@ class _CalendarView extends State<CalendarView> {
             children: [
               Text(
                 event.title,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
