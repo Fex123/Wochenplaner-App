@@ -6,6 +6,7 @@ class Task {
   DateTime? taskDate;
   DateTime? startTime;
   DateTime? endTime;
+  String? imagePath; // Add this line
 
   //To-Do: Add options for pictures and memory
 
@@ -21,6 +22,7 @@ class Task {
     this.taskDate,
     this.startTime,
     this.endTime,
+    this.imagePath, // Add this line
   });
 
   void changeTaskState() {
@@ -57,6 +59,7 @@ class Task {
     DateTime? taskDate,
     DateTime? startTime,
     DateTime? endTime,
+    String? imagePath, // Add this line
     bool? isCompleted,
   }) {
     return Task(
@@ -66,6 +69,7 @@ class Task {
       taskDate: taskDate ?? this.taskDate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
+      imagePath: imagePath ?? this.imagePath, // Add this line
     )..isCompleted = isCompleted ?? this.isCompleted;
   }
 }

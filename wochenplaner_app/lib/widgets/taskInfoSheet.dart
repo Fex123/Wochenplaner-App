@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
@@ -20,88 +21,126 @@ class TaskInfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity, // Füllt die gesamte Breite des Bildschirms
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                task.title,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pop(context); // Schließt das Bottom Sheet
-                },
-              ),
-            ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          const SizedBox(height: 8),
-          const Divider(), // Trennlinie
-          Text(
-            task.description == ''
-                ? 'Diese Task hat keine Beschreibung.'
-                : task.description!,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          const Divider(), // Trennlinie
-          if (task.taskDate != null)
-            Text(
-              'Datum: ${DateFormat.yMMMd().format(task.taskDate!)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-          if (task.startTime != null && task.endTime != null)
-            Text(
-              'Zeitraum: ${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-          const SizedBox(height: 16),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    Task? newTask = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Createedittask(
-                          taskManager: taskManager,
-                          taskToEdit: task,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      task.title,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context); // Schließt das Bottom Sheet
+                      },
+                    ),
+                  ],
+                ),
+                const Divider(), // Trennlinie
+                const SizedBox(height: 8),
+                if (task.description != null &&
+                    task.description!.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      task.description!,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const Divider(), // Divider under the description
+                ],
+                if (task.taskDate != null)
+                  Text(
+                    'Datum: ${DateFormat.yMMMd().format(task.taskDate!)}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                if (task.startTime != null && task.endTime != null) ...[
+                  Text(
+                    'Zeitraum: ${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const Divider(), // Divider under the time
+                ],
+                if (task.imagePath != null) ...[
+                  const Divider(), // Trennlinie
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: GestureDetector(
+                      child: Container(
+                        width: double.infinity,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.file(
+                            File(task.imagePath!),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    );
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          Task? newTask = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Createedittask(
+                                taskManager: taskManager,
+                                taskToEdit: task,
+                              ),
+                            ),
+                          );
 
-                    if (newTask != null) {
-                      taskManager.updateTask(newTask);
-                      onTaskUpdated(); // Refresh the task list
-                    }
+                          if (newTask != null) {
+                            taskManager.updateTask(newTask);
+                            onTaskUpdated(); // Refresh the task list
+                          }
 
-                    Navigator.pop(context);
-                  },
-                  child: const Text('bearbeiten'),
-                ),
-                const SizedBox(width: 16), // Abstand zwischen den Buttons
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    taskManager.removeTask(task);
-                    Navigator.pop(context); // Schließt das Bottom Sheet
-                    onTaskRemoved(); // Aktualisiert die Ansicht
-                  },
+                          Navigator.pop(context);
+                        },
+                        child: const Text('bearbeiten'),
+                      ),
+                      const SizedBox(width: 16), // Abstand zwischen den Buttons
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          taskManager.removeTask(task);
+                          Navigator.pop(context); // Schließt das Bottom Sheet
+                          onTaskRemoved(); // Aktualisiert die Ansicht
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

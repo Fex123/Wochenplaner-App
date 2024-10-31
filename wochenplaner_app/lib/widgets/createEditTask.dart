@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
+import 'dart:io'; // Add this import
+import 'package:image_picker/image_picker.dart'; // Add this import
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
@@ -21,6 +23,7 @@ class _CreateedittaskState extends State<Createedittask> {
   final TextEditingController endTimeController = TextEditingController();
 
   Text errorText = const Text('');
+  File? _image; // Add this line
 
   @override
   void initState() {
@@ -32,15 +35,30 @@ class _CreateedittaskState extends State<Createedittask> {
         selectedDateController.text =
             DateFormat('yyyy-MM-dd').format(widget.taskToEdit!.taskDate!);
       }
-      if (widget.taskToEdit!.startTime != null) {
-        startTimeController.text =
-            DateFormat.jm().format(widget.taskToEdit!.startTime!);
-      }
-      if (widget.taskToEdit!.endTime != null) {
-        endTimeController.text =
-            DateFormat.jm().format(widget.taskToEdit!.endTime!);
+      if (widget.taskToEdit!.imagePath != null) {
+        _image = File(widget.taskToEdit!.imagePath!);
       }
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.taskToEdit != null) {
+      if (widget.taskToEdit!.startTime != null) {
+        startTimeController.text = _formatTime(widget.taskToEdit!.startTime!);
+      }
+      if (widget.taskToEdit!.endTime != null) {
+        endTimeController.text = _formatTime(widget.taskToEdit!.endTime!);
+      }
+    }
+  }
+
+  String _formatTime(DateTime time) {
+    final format = MediaQuery.of(context).alwaysUse24HourFormat
+        ? DateFormat('HH:mm')
+        : DateFormat('hh:mm a');
+    return format.format(time);
   }
 
   void saveTask() {
@@ -120,9 +138,9 @@ class _CreateedittaskState extends State<Createedittask> {
     if (_startTime != null &&
         _endTime != null &&
         !(TimeOfDay.fromDateTime(_startTime).period == DayPeriod.pm &&
-          TimeOfDay.fromDateTime(_startTime).hour == 12 &&
-          TimeOfDay.fromDateTime(_endTime).period == DayPeriod.am &&
-          TimeOfDay.fromDateTime(_endTime).hour == 0) &&
+            TimeOfDay.fromDateTime(_startTime).hour == 12 &&
+            TimeOfDay.fromDateTime(_endTime).period == DayPeriod.am &&
+            TimeOfDay.fromDateTime(_endTime).hour == 0) &&
         (_startTime.hour > _endTime.hour ||
             (_startTime.hour == _endTime.hour &&
                 _startTime.minute >= _endTime.minute) ||
@@ -144,6 +162,7 @@ class _CreateedittaskState extends State<Createedittask> {
         taskDate: selDate,
         startTime: _startTime,
         endTime: _endTime,
+        imagePath: _image?.path, // Add this line
       );
     } else {
       newTask = Task(
@@ -153,75 +172,127 @@ class _CreateedittaskState extends State<Createedittask> {
         taskDate: selDate,
         startTime: _startTime,
         endTime: _endTime,
+        imagePath: _image?.path, // Add this line
       );
     }
 
     Navigator.pop(context, newTask);
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await showDialog<XFile?>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Image'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Camera'),
+              onPressed: () async {
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                Navigator.of(context).pop(pickedFile);
+              },
+            ),
+            TextButton(
+              child: const Text('Gallery'),
+              onPressed: () async {
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                Navigator.of(context).pop(pickedFile);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Create/Edit Task'),
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TaskTextField(
-                    labelText: "Enter task name",
-                    widthMultiplyer: 2,
-                    controller: taskNameController,
-                    maxInputLength: 20,
+      appBar: AppBar(
+        title: const Text('Create/Edit Task'),
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TaskTextField(
+                  labelText: "Enter task name",
+                  widthMultiplyer: 2,
+                  controller: taskNameController,
+                  maxInputLength: 20,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TaskTextField(
+                  labelText: "Enter task description",
+                  widthMultiplyer: 2,
+                  controller: taskDescriptionController,
+                  maxInputLength: 120,
+                  lines: 5,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SelectDate(
+                  controller: selectedDateController,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SelectTime(
+                  startTimeController: startTimeController,
+                  endTimeController: endTimeController,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: 125 * 2,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: _image == null
+                        ? const Center(child: Text('Tap to add an image'))
+                        : Image.file(_image!, fit: BoxFit.cover),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TaskTextField(
-                    labelText: "Enter task description",
-                    widthMultiplyer: 2,
-                    controller: taskDescriptionController,
-                    maxInputLength: 120,
-                    lines: 5,
-                  ),
+              ),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CancelButton(
+                      onPressed: () {
+                        Navigator.pop(context, null);
+                      },
+                    ),
+                    const SizedBox(width: 16), // Abstand zwischen den Buttons
+                    SaveButton(saveTask: saveTask),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SelectDate(
-                    controller: selectedDateController,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SelectTime(
-                    startTimeController: startTimeController,
-                    endTimeController: endTimeController,
-                  ),
-                ),
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CancelButton(
-                        onPressed: () {
-                          //TODO: WHen pressing Cancel in edit mode, it pauses here
-                          Navigator.pop(context, null);
-                        },
-                      ),
-                      const SizedBox(width: 16), // Abstand zwischen den Buttons
-                      SaveButton(saveTask: saveTask),
-                    ],
-                  ),
-                ),
-                errorText,
-              ],
-            ),
+              ),
+              errorText,
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -232,7 +303,6 @@ class TaskTextField extends StatelessWidget {
   final TextEditingController controller;
   final int? lines;
   final int? maxInputLength;
-
 
   const TaskTextField({
     super.key,

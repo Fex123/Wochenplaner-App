@@ -49,10 +49,11 @@ class _CalendarView extends State<CalendarView> {
                 ),
               ),
             );
-            if(newtask != null) {
-            setState(() {
-              widget.taskManager.addTask(newtask);
-            });}
+            if (newtask != null) {
+              setState(() {
+                widget.taskManager.addTask(newtask);
+              });
+            }
           },
           child: const Icon(Icons.add),
         ),
