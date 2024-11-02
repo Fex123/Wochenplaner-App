@@ -259,9 +259,9 @@ class _TaskCardState extends State<TaskCard> {
                         });
                       },
                       checkColor: stateColors[2], // Check mark color
-                      fillColor: MaterialStateProperty.resolveWith((states) {
+                      fillColor: WidgetStateProperty.resolveWith((states) {
                         // Sets the fill color based on checked state
-                        if (states.contains(MaterialState.selected)) {
+                        if (states.contains(WidgetState.selected)) {
                           return Colors.white; // Checked state color
                         }
                         return Colors.transparent; // Unchecked state color

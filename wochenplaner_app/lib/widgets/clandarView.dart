@@ -89,7 +89,7 @@ class _CalendarView extends State<CalendarView> {
           onEventTap: (events, date) {
             if (events.isNotEmpty) {
               Task task = _getTaskFromEvent(events.first);
-              _showTaskDetails(context, task);
+              _showTaskInfoSheet(context, task);
             }
           },
         );
@@ -100,7 +100,7 @@ class _CalendarView extends State<CalendarView> {
           onEventTap: (events, date) {
             if (events.isNotEmpty) {
               Task task = _getTaskFromEvent(events.first);
-              _showTaskDetails(context, task);
+              _showTaskInfoSheet(context, task);
             }
           },
         );
@@ -108,7 +108,7 @@ class _CalendarView extends State<CalendarView> {
         return MonthView(onEventTap: (events, date) {
           if (events != null) {
             Task task = _getTaskFromEvent(events);
-            _showTaskDetails(context, task);
+            _showTaskInfoSheet(context, task);
           }
         });
       default:
@@ -207,40 +207,23 @@ class _CalendarView extends State<CalendarView> {
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
   }
 
-  void _showTaskDetails(BuildContext context, Task task) {
+  void _showTaskInfoSheet(BuildContext context, Task task) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          width: double.infinity, // Füllt die gesamte Breite des Bildschirms
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                task.title,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                task.description ?? 'No description',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              if (task.taskDate != null)
-                Text(
-                  'Date: ${DateFormat.yMMMd().format(task.taskDate!)}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              if (task.startTime != null && task.endTime != null)
-                Text(
-                  'Time: ${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-            ],
-          ),
+        return TaskInfoSheet(
+          taskManager: widget.taskManager,
+          task: task,
+          onTaskRemoved: () => {
+            setState(() {
+              // Just refresh the view
+            })
+          },
+          onTaskUpdated: () => {
+            setState(() {
+              // Just refresh the view
+            })
+          },
         );
       },
     );
