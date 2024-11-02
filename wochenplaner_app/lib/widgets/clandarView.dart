@@ -88,7 +88,8 @@ class _CalendarView extends State<CalendarView> {
           endHour: settings.getEndHour(),
           onEventTap: (events, date) {
             if (events.isNotEmpty) {
-              _showTaskDetails(context, events.first);
+              Task task = _getTaskFromEvent(events.first);
+              _showTaskDetails(context, task);
             }
           },
         );
@@ -98,14 +99,16 @@ class _CalendarView extends State<CalendarView> {
           endHour: settings.getEndHour(),
           onEventTap: (events, date) {
             if (events.isNotEmpty) {
-              _showTaskDetails(context, events.first);
+              Task task = _getTaskFromEvent(events.first);
+              _showTaskDetails(context, task);
             }
           },
         );
       case 2:
         return MonthView(onEventTap: (events, date) {
           if (events != null) {
-            _showTaskDetails(context, events);
+            Task task = _getTaskFromEvent(events);
+            _showTaskDetails(context, task);
           }
         });
       default:
@@ -119,7 +122,7 @@ class _CalendarView extends State<CalendarView> {
           task.startTime != null &&
           task.endTime != null;
     }).map((task) {
-      return CalendarEventData(
+      final eventData = CalendarEventData(
         date: task.taskDate!,
         title: task.title,
         description: task.description,
@@ -129,7 +132,15 @@ class _CalendarView extends State<CalendarView> {
         titleStyle: const TextStyle(fontSize: 15),
         descriptionStyle: const TextStyle(fontSize: 13),
       );
+      task.eventData = eventData; // Store the event data in the task
+      return eventData;
     }).toList();
+  }
+
+  Task _getTaskFromEvent(CalendarEventData event) {
+    return widget.taskManager
+        .getTasks()
+        .firstWhere((task) => task.eventData == event);
   }
 
   Color _getTaskColor(Task task) {
@@ -145,6 +156,8 @@ class _CalendarView extends State<CalendarView> {
   }
 
   bool isTaskLate(Task task) {
+    if (task.taskDate == null || task.endTime == null) return false;
+
     final now = DateTime.now();
     final taskEndTime = DateTime(
       task.taskDate!.year,
@@ -153,10 +166,21 @@ class _CalendarView extends State<CalendarView> {
       task.endTime!.hour,
       task.endTime!.minute,
     );
+
+    // Check if the task spans across midnight
+    if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
+      // If the current time is before the task end time on the next day
+      final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
+      return now.isAfter(taskEndTimeNextDay);
+    }
+
     return now.isAfter(taskEndTime);
   }
 
   bool isTaskInProgress(Task task) {
+    if (task.taskDate == null || task.startTime == null || task.endTime == null)
+      return false;
+
     final now = DateTime.now();
     final taskStartTime = DateTime(
       task.taskDate!.year,
@@ -165,17 +189,25 @@ class _CalendarView extends State<CalendarView> {
       task.startTime!.hour,
       task.startTime!.minute,
     );
-    final taskEndTime = DateTime(
+    var taskEndTime = DateTime(
       task.taskDate!.year,
       task.taskDate!.month,
       task.taskDate!.day,
       task.endTime!.hour,
       task.endTime!.minute,
     );
+
+    // Check if the task spans across midnight
+    if (task.startTime!.hour > task.endTime!.hour ||
+        (task.startTime!.hour == task.endTime!.hour &&
+            task.startTime!.minute > task.endTime!.minute)) {
+      taskEndTime = taskEndTime.add(Duration(days: 1));
+    }
+
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
   }
 
-  void _showTaskDetails(BuildContext context, CalendarEventData event) {
+  void _showTaskDetails(BuildContext context, Task task) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -187,24 +219,24 @@ class _CalendarView extends State<CalendarView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                event.title,
+                task.title,
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                event.description ?? 'No description',
+                task.description ?? 'No description',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
-              if (event.date != null)
+              if (task.taskDate != null)
                 Text(
-                  'Date: ${DateFormat.yMMMd().format(event.date)}',
+                  'Date: ${DateFormat.yMMMd().format(task.taskDate!)}',
                   style: const TextStyle(fontSize: 16),
                 ),
-              if (event.startTime != null && event.endTime != null)
+              if (task.startTime != null && task.endTime != null)
                 Text(
-                  'Time: ${DateFormat.jm().format(event.startTime!)} - ${DateFormat.jm().format(event.endTime!)}',
+                  'Time: ${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}',
                   style: const TextStyle(fontSize: 16),
                 ),
             ],

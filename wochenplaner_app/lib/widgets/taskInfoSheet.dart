@@ -106,6 +106,7 @@ class TaskInfoSheet extends StatelessWidget {
                     children: [
                       ElevatedButton(
                         onPressed: () async {
+                          Navigator.pop(context);
                           Task? newTask = await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -120,8 +121,6 @@ class TaskInfoSheet extends StatelessWidget {
                             taskManager.updateTask(newTask);
                             onTaskUpdated(); // Refresh the task list
                           }
-
-                          Navigator.pop(context);
                         },
                         child: const Text('bearbeiten'),
                       ),

@@ -1,3 +1,5 @@
+import 'package:calendar_view/calendar_view.dart';
+
 class Task {
   //obvious attributes
 
@@ -6,7 +8,8 @@ class Task {
   DateTime? taskDate;
   DateTime? startTime;
   DateTime? endTime;
-  String? imagePath; // Add this line
+  String? imagePath;
+  CalendarEventData? eventData;
 
   //To-Do: Add options for pictures and memory
 
@@ -47,6 +50,10 @@ class Task {
 
   String? getTaskDescription() {
     return description;
+  }
+
+  void setEvent(CalendarEventData event) {
+    eventData = event;
   }
 
   //To-Do: Add a function to set the start and end date/time

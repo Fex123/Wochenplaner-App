@@ -140,6 +140,7 @@ class _TaskCardState extends State<TaskCard> {
 
   bool isTaskLate(Task task) {
     if (task.taskDate == null || task.endTime == null) return false;
+
     final now = DateTime.now();
     final taskEndTime = DateTime(
       task.taskDate!.year,
@@ -148,12 +149,21 @@ class _TaskCardState extends State<TaskCard> {
       task.endTime!.hour,
       task.endTime!.minute,
     );
+
+    // Check if the task spans across midnight
+    if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
+      // If the current time is before the task end time on the next day
+      final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
+      return now.isAfter(taskEndTimeNextDay);
+    }
+
     return now.isAfter(taskEndTime);
   }
 
   bool isTaskInProgress(Task task) {
     if (task.taskDate == null || task.startTime == null || task.endTime == null)
       return false;
+
     final now = DateTime.now();
     final taskStartTime = DateTime(
       task.taskDate!.year,
@@ -162,13 +172,21 @@ class _TaskCardState extends State<TaskCard> {
       task.startTime!.hour,
       task.startTime!.minute,
     );
-    final taskEndTime = DateTime(
+    var taskEndTime = DateTime(
       task.taskDate!.year,
       task.taskDate!.month,
       task.taskDate!.day,
       task.endTime!.hour,
       task.endTime!.minute,
     );
+
+    // Check if the task spans across midnight
+    if (task.startTime!.hour > task.endTime!.hour ||
+        (task.startTime!.hour == task.endTime!.hour &&
+            task.startTime!.minute > task.endTime!.minute)) {
+      taskEndTime = taskEndTime.add(Duration(days: 1));
+    }
+
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
   }
 
