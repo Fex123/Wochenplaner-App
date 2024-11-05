@@ -8,12 +8,13 @@ import 'package:wochenplaner_app/widgets/taskListView.dart';
 import 'package:wochenplaner_app/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   TaskManager taskManager = TaskManager();
   Settings settings = Settings();
   runApp(MyApp(taskManager: taskManager, settings: settings));
@@ -38,35 +39,35 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  MaterialTheme mainTheme = const MaterialTheme(Typography.blackCupertino);
+  final TextTheme textTheme = GoogleFonts.poppinsTextTheme(
+    ThemeData.light().textTheme,
+  );
+
+  late MaterialTheme mainTheme;
 
   @override
   Widget build(BuildContext context) {
+    mainTheme = MaterialTheme(textTheme);
     return MaterialApp(
-      title: 'Wochenplaner',
-      theme: mainTheme.light(),
-      /* ThemeData(
-        brightness: Brightness.light, // Helles Thema
-        primarySwatch: Colors.blue,
-        colorScheme: MaterialTheme.lightScheme().toColorScheme(),
-        scaffoldBackgroundColor: const Color.fromARGB(
-            255, 212, 197, 197), // Set dark background color
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
-      ),*/
-      darkTheme: mainTheme.dark(),
-      /*ThemeData(
-        brightness: Brightness.dark, // Dunkles Thema
-        primarySwatch: Colors.blue,
-      ),*/
-      themeMode: _themeMode,
-      home: LoginScreen(taskManager: widget.taskManager, settings: widget.settings,toggleThemeMode: toggleThemeMode,) //MyHomePage(taskManager: widget.taskManager, toggleThemeMode: toggleThemeMode, settings: widget.settings,),
-    );
+        title: 'Wochenplaner',
+        theme: mainTheme.light(),
+        darkTheme: mainTheme.dark(),
+        themeMode: _themeMode,
+        home: LoginScreen(
+          taskManager: widget.taskManager,
+          settings: widget.settings,
+          toggleThemeMode: toggleThemeMode,
+        ) //MyHomePage(taskManager: widget.taskManager, toggleThemeMode: toggleThemeMode, settings: widget.settings,),
+        );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.taskManager, required this.toggleThemeMode, required this.settings});
+  const MyHomePage(
+      {super.key,
+      required this.taskManager,
+      required this.toggleThemeMode,
+      required this.settings});
   final VoidCallback toggleThemeMode;
   final TaskManager taskManager;
   final Settings settings;

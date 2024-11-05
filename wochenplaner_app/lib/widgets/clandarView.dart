@@ -1,6 +1,5 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
@@ -29,10 +28,7 @@ class _CalendarView extends State<CalendarView> {
         ..addAll(_convertTasksToEvents(widget.taskManager)),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Calendar',
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-              )),
+          title: StaticComponents.staticAppBar('Calendar'),
           automaticallyImplyLeading: false,
         ),
         body: Column(
@@ -119,7 +115,7 @@ class _CalendarView extends State<CalendarView> {
             onEventTap: (events, date) {
               Task task = _getTaskFromEvent(events);
               _showTaskInfoSheet(context, task);
-                        },
+            },
             headerStyle: _headerStyle);
       default:
         return Container();
@@ -138,8 +134,22 @@ class _CalendarView extends State<CalendarView> {
         description: task.description,
         startTime: task.startTime!,
         endTime: task.endTime!,
-        color: _getTaskColor(task),
-        titleStyle: const TextStyle(fontSize: 15),
+        color: (task.isCompleted
+            ? AppColors.done
+            : (isTaskLate(task)
+                ? AppColors.late.value
+                : (isTaskInProgress(task)
+                    ? AppColors.inProgress.value
+                    : AppColors.notStarted))),
+        titleStyle: TextStyle(
+            fontSize: 15,
+            color: (task.isCompleted
+                ? Colors.white
+                : (isTaskLate(task)
+                    ? AppColors.late.light.onColor
+                    : (isTaskInProgress(task)
+                        ? AppColors.inProgress.light.onColor
+                        : Colors.white)))),
         descriptionStyle: const TextStyle(fontSize: 13),
       );
       task.eventData = eventData; // Store the event data in the task
@@ -151,18 +161,6 @@ class _CalendarView extends State<CalendarView> {
     return widget.taskManager
         .getTasks()
         .firstWhere((task) => task.eventData == event);
-  }
-
-  Color _getTaskColor(Task task) {
-    if (task.isCompleted) {
-      return AppColors.checked;
-    } else if (isTaskLate(task)) {
-      return AppColors.uncheckedLate;
-    } else if (isTaskInProgress(task)) {
-      return AppColors.inProgress;
-    } else {
-      return AppColors.notStarted;
-    }
   }
 
   bool isTaskLate(Task task) {
@@ -188,7 +186,9 @@ class _CalendarView extends State<CalendarView> {
   }
 
   bool isTaskInProgress(Task task) {
-    if (task.taskDate == null || task.startTime == null || task.endTime == null) {
+    if (task.taskDate == null ||
+        task.startTime == null ||
+        task.endTime == null) {
       return false;
     }
 

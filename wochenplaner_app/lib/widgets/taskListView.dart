@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:wochenplaner_app/staticAppVariables.dart';
 import '../../data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
 import 'package:wochenplaner_app/widgets/taskInfoSheet.dart';
+import 'package:wochenplaner_app/staticAppVariables.dart';
 
 class Tasklistview extends StatefulWidget {
   const Tasklistview({super.key, required this.taskManager});
@@ -20,13 +19,7 @@ class _tasklistview extends State<Tasklistview> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tasks',
-            style: TextStyle(
-              fontWeight: FontWeight.w900,
-            )),
-        automaticallyImplyLeading: false,
-      ),
+      appBar: StaticComponents.staticAppBar('Tasks'),
       body: Center(
         child: TaskCardList(taskManager: widget.taskManager),
       ),
@@ -46,8 +39,8 @@ class _tasklistview extends State<Tasklistview> {
             });
           }
         },
-        shape: const CircleBorder(),
         child: const Icon(Icons.add),
+        shape: const CircleBorder(),
       ),
     );
   }
@@ -136,14 +129,6 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
-  // Colors for "unchecked and late", "in Progress", "Checked", "Not started"
-  final List<Color> stateColors = [
-    AppColors.uncheckedLate, // Unchecked and late color
-    AppColors.inProgress, // In Progress color
-    AppColors.checked, // Checked color
-    AppColors.notStarted // Not started color
-  ];
-
   bool isTaskLate(Task task) {
     if (task.taskDate == null || task.endTime == null) return false;
 
@@ -159,7 +144,7 @@ class _TaskCardState extends State<TaskCard> {
     // Check if the task spans across midnight
     if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
       // If the current time is before the task end time on the next day
-      final taskEndTimeNextDay = taskEndTime.add(const Duration(days: 1));
+      final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
       return now.isAfter(taskEndTimeNextDay);
     }
 
@@ -167,9 +152,8 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   bool isTaskInProgress(Task task) {
-    if (task.taskDate == null || task.startTime == null || task.endTime == null) {
+    if (task.taskDate == null || task.startTime == null || task.endTime == null)
       return false;
-    }
 
     final now = DateTime.now();
     final taskStartTime = DateTime(
@@ -191,7 +175,7 @@ class _TaskCardState extends State<TaskCard> {
     if (task.startTime!.hour > task.endTime!.hour ||
         (task.startTime!.hour == task.endTime!.hour &&
             task.startTime!.minute > task.endTime!.minute)) {
-      taskEndTime = taskEndTime.add(const Duration(days: 1));
+      taskEndTime = taskEndTime.add(Duration(days: 1));
     }
 
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
@@ -217,12 +201,12 @@ class _TaskCardState extends State<TaskCard> {
           children: [
             Card(
               color: isChecked
-                  ? stateColors[2]
+                  ? AppColors.done
                   : isTaskLate(widget.task)
-                      ? stateColors[0] // Late
+                      ? AppColors.late.value // Late
                       : isTaskInProgress(widget.task)
-                          ? stateColors[1] // In Progress
-                          : stateColors[3], // Not Started
+                          ? AppColors.inProgress.value // In Progress
+                          : AppColors.notStarted, // Not Started
               margin: widget.task.taskDate == null ||
                       widget.task.startTime == null ||
                       widget.task.endTime == null
@@ -248,10 +232,20 @@ class _TaskCardState extends State<TaskCard> {
                   children: [
                     Text(
                       widget.task.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isChecked
+                            ? AppColors.onDone
+                            : isTaskLate(widget.task)
+                                ? AppColors.late.light.onColor // Late
+                                : isTaskInProgress(widget.task)
+                                    ? AppColors
+                                        .inProgress.light.onColor // In Progress
+                                    : AppColors.onNotStarted,
+                        decoration: isChecked
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -265,17 +259,16 @@ class _TaskCardState extends State<TaskCard> {
                           widget.onTaskUpdated(); // Refresh the task list
                         });
                       },
-                      checkColor: stateColors[2], // Check mark color
+                      checkColor: AppColors.done, // Check mark color
                       fillColor: WidgetStateProperty.resolveWith((states) {
                         // Sets the fill color based on checked state
                         if (states.contains(WidgetState.selected)) {
-                          return Colors.white; // Checked state color
+                          return AppColors.onDone;
                         }
                         return Colors.transparent; // Unchecked state color
                       }),
-                      side: const BorderSide(
-                          color: Colors.white,
-                          width: 3.0), // White border when unchecked
+                      side:
+                          const BorderSide(color: AppColors.onDone, width: 3.0),
                     ),
                   ],
                 ),
@@ -285,7 +278,8 @@ class _TaskCardState extends State<TaskCard> {
                 widget.task.startTime != null &&
                 widget.task.endTime != null)
               Card(
-                color: Colors.white,
+                color: Colors
+                    .white, // TODO: Replace with Theme Color for Container
                 margin: const EdgeInsets.only(
                     top: 0, bottom: 10), // Zero margin only at the top
                 shape: const RoundedRectangleBorder(
@@ -301,7 +295,8 @@ class _TaskCardState extends State<TaskCard> {
                     '${DateFormat.yMMMd().format(widget.task.taskDate!)}\n${formatTime(true)} - ${formatTime(false)}',
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Colors.black,
+                      color: Colors
+                          .black, //TODO: Replace with Theme Color for OnContainer
                     ),
                     textAlign: TextAlign.center,
                   ),

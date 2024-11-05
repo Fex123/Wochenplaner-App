@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
+import 'package:wochenplaner_app/staticAppVariables.dart';
 
 class SettingsView extends StatefulWidget {
   final VoidCallback toggleThemeMode;
   final Settings settings;
 
-  const SettingsView({super.key, required this.toggleThemeMode, required this.settings});
+  const SettingsView(
+      {super.key, required this.toggleThemeMode, required this.settings});
 
   @override
   _SettingsViewState createState() => _SettingsViewState();
@@ -27,7 +29,9 @@ class _SettingsViewState extends State<SettingsView> {
     setState(() {
       startHour = value;
       widget.settings.setStartHour(value.toInt());
-      endHour = widget.settings.getEndHour().toDouble(); // Update endHour based on settings
+      endHour = widget.settings
+          .getEndHour()
+          .toDouble(); // Update endHour based on settings
     });
   }
 
@@ -35,17 +39,16 @@ class _SettingsViewState extends State<SettingsView> {
     setState(() {
       endHour = value;
       widget.settings.setEndHour(value.toInt());
-      startHour = widget.settings.getStartHour().toDouble(); // Update startHour based on settings
+      startHour = widget.settings
+          .getStartHour()
+          .toDouble(); // Update startHour based on settings
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        automaticallyImplyLeading: false,
-      ),
+      appBar: StaticComponents.staticAppBar('Settings'),
       body: Column(
         children: [
           Padding(
@@ -148,8 +151,13 @@ class CustomSlider extends StatefulWidget {
   final int max;
   final String description;
 
-  const CustomSlider({super.key, required this.value, required this.onChanged, required this.min, 
-  required this.max, required this.description});
+  const CustomSlider(
+      {super.key,
+      required this.value,
+      required this.onChanged,
+      required this.min,
+      required this.max,
+      required this.description});
 
   @override
   State<CustomSlider> createState() => _CustomSliderState();
@@ -172,7 +180,8 @@ class _CustomSliderState extends State<CustomSlider> {
                 value: _value,
                 min: widget.min.toDouble(),
                 max: widget.max.toDouble(),
-                divisions: (widget.max > widget.min) ? widget.max - widget.min : null,
+                divisions:
+                    (widget.max > widget.min) ? widget.max - widget.min : null,
                 label: _value.toInt().toString(),
                 onChanged: (double value) {
                   setState(() {
