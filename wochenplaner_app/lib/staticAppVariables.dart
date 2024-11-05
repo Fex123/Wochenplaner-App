@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wochenplaner_app/theme.dart';
 
 class AppColors {
   static const Color uncheckedLate =

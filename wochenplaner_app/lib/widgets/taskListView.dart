@@ -46,8 +46,8 @@ class _tasklistview extends State<Tasklistview> {
             });
           }
         },
-        child: const Icon(Icons.add),
         shape: const CircleBorder(),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -159,7 +159,7 @@ class _TaskCardState extends State<TaskCard> {
     // Check if the task spans across midnight
     if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
       // If the current time is before the task end time on the next day
-      final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
+      final taskEndTimeNextDay = taskEndTime.add(const Duration(days: 1));
       return now.isAfter(taskEndTimeNextDay);
     }
 
@@ -167,8 +167,9 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   bool isTaskInProgress(Task task) {
-    if (task.taskDate == null || task.startTime == null || task.endTime == null)
+    if (task.taskDate == null || task.startTime == null || task.endTime == null) {
       return false;
+    }
 
     final now = DateTime.now();
     final taskStartTime = DateTime(
@@ -190,7 +191,7 @@ class _TaskCardState extends State<TaskCard> {
     if (task.startTime!.hour > task.endTime!.hour ||
         (task.startTime!.hour == task.endTime!.hour &&
             task.startTime!.minute > task.endTime!.minute)) {
-      taskEndTime = taskEndTime.add(Duration(days: 1));
+      taskEndTime = taskEndTime.add(const Duration(days: 1));
     }
 
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);

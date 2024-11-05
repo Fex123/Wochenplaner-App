@@ -95,14 +95,14 @@ class _CreateedittaskState extends State<Createedittask> {
       }
     }
 
-    DateTime? _startTime;
+    DateTime? startTime;
     try {
-      _startTime = startTimeController.text.isEmpty
+      startTime = startTimeController.text.isEmpty
           ? null
           : DateFormat('hh:mm a').parseStrict(startTimeController.text);
     } catch (e) {
       try {
-        _startTime = startTimeController.text.isEmpty
+        startTime = startTimeController.text.isEmpty
             ? null
             : DateFormat('HH:mm').parseStrict(startTimeController.text);
       } catch (e) {
@@ -115,14 +115,14 @@ class _CreateedittaskState extends State<Createedittask> {
       }
     }
 
-    DateTime? _endTime;
+    DateTime? endTime;
     try {
-      _endTime = endTimeController.text.isEmpty
+      endTime = endTimeController.text.isEmpty
           ? null
           : DateFormat('hh:mm a').parseStrict(endTimeController.text);
     } catch (e) {
       try {
-        _endTime = endTimeController.text.isEmpty
+        endTime = endTimeController.text.isEmpty
             ? null
             : DateFormat('HH:mm').parseStrict(endTimeController.text);
       } catch (e) {
@@ -135,17 +135,17 @@ class _CreateedittaskState extends State<Createedittask> {
       }
     }
 
-    if (_startTime != null &&
-        _endTime != null &&
-        !(TimeOfDay.fromDateTime(_startTime).period == DayPeriod.pm &&
-            TimeOfDay.fromDateTime(_startTime).hour == 12 &&
-            TimeOfDay.fromDateTime(_endTime).period == DayPeriod.am &&
-            TimeOfDay.fromDateTime(_endTime).hour == 0) &&
-        (_startTime.hour > _endTime.hour ||
-            (_startTime.hour == _endTime.hour &&
-                _startTime.minute >= _endTime.minute) ||
-            (_endTime.hour == 0 && _endTime.minute > 0))) {
-      if (_endTime.hour != 0 && _endTime.minute != 0) {
+    if (startTime != null &&
+        endTime != null &&
+        !(TimeOfDay.fromDateTime(startTime).period == DayPeriod.pm &&
+            TimeOfDay.fromDateTime(startTime).hour == 12 &&
+            TimeOfDay.fromDateTime(endTime).period == DayPeriod.am &&
+            TimeOfDay.fromDateTime(endTime).hour == 0) &&
+        (startTime.hour > endTime.hour ||
+            (startTime.hour == endTime.hour &&
+                startTime.minute >= endTime.minute) ||
+            (endTime.hour == 0 && endTime.minute > 0))) {
+      if (endTime.hour != 0 && endTime.minute != 0) {
         setState(() {
           errorText = const Text('Start is after or equal to end',
               style: TextStyle(color: Colors.red));
@@ -160,8 +160,8 @@ class _CreateedittaskState extends State<Createedittask> {
         title: taskNameController.text,
         description: taskDescriptionController.text,
         taskDate: selDate,
-        startTime: _startTime,
-        endTime: _endTime,
+        startTime: startTime,
+        endTime: endTime,
         imagePath: _image?.path, // Add this line
       );
     } else {
@@ -170,8 +170,8 @@ class _CreateedittaskState extends State<Createedittask> {
         title: taskNameController.text,
         description: taskDescriptionController.text,
         taskDate: selDate,
-        startTime: _startTime,
-        endTime: _endTime,
+        startTime: startTime,
+        endTime: endTime,
         imagePath: _image?.path, // Add this line
       );
     }

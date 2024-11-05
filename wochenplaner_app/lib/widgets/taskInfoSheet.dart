@@ -12,12 +12,12 @@ class TaskInfoSheet extends StatelessWidget {
   final VoidCallback onTaskRemoved;
 
   const TaskInfoSheet({
-    Key? key,
+    super.key,
     required this.task,
     required this.taskManager,
     required this.onTaskUpdated,
     required this.onTaskRemoved,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

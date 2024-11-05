@@ -59,8 +59,8 @@ class _CalendarView extends State<CalendarView> {
               });
             }
           },
-          child: const Icon(Icons.add),
           shape: const CircleBorder(),
+          child: const Icon(Icons.add),
         ),
       ),
     );
@@ -117,11 +117,9 @@ class _CalendarView extends State<CalendarView> {
       case 2:
         return MonthView(
             onEventTap: (events, date) {
-              if (events != null) {
-                Task task = _getTaskFromEvent(events);
-                _showTaskInfoSheet(context, task);
-              }
-            },
+              Task task = _getTaskFromEvent(events);
+              _showTaskInfoSheet(context, task);
+                        },
             headerStyle: _headerStyle);
       default:
         return Container();
@@ -182,7 +180,7 @@ class _CalendarView extends State<CalendarView> {
     // Check if the task spans across midnight
     if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
       // If the current time is before the task end time on the next day
-      final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
+      final taskEndTimeNextDay = taskEndTime.add(const Duration(days: 1));
       return now.isAfter(taskEndTimeNextDay);
     }
 
@@ -190,8 +188,9 @@ class _CalendarView extends State<CalendarView> {
   }
 
   bool isTaskInProgress(Task task) {
-    if (task.taskDate == null || task.startTime == null || task.endTime == null)
+    if (task.taskDate == null || task.startTime == null || task.endTime == null) {
       return false;
+    }
 
     final now = DateTime.now();
     final taskStartTime = DateTime(
@@ -213,7 +212,7 @@ class _CalendarView extends State<CalendarView> {
     if (task.startTime!.hour > task.endTime!.hour ||
         (task.startTime!.hour == task.endTime!.hour &&
             task.startTime!.minute > task.endTime!.minute)) {
-      taskEndTime = taskEndTime.add(Duration(days: 1));
+      taskEndTime = taskEndTime.add(const Duration(days: 1));
     }
 
     return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);

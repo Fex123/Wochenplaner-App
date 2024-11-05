@@ -51,20 +51,75 @@ class _LoginScreen extends State<LoginScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     _errorMessage,
-                    style: TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
+              GestureDetector(
+                onTap: () async {
+                  final email = _emailController.text.trim();
+
+                  if (!_isValidEmail(email)) {
+                    setState(() {
+                      _errorMessage = 'That\'s not a valid email address.';
+                    });
+                    return;
+                  }
+
+                  try {
+                    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+                    setState(() {
+                      _errorMessage = 'Password reset email sent. Please check your inbox.';
+                    });
+                  } on FirebaseAuthException catch (e) {
+                    setState(() {
+                      if (e.code == 'user-not-found') {
+                        _errorMessage = 'No user found for that email.';
+                      } else {
+                        _errorMessage = 'An error occurred. Please try again.';
+                      }
+                    });
+                  } catch (e) {
+                    setState(() {
+                      _errorMessage = 'An error occurred. Please try again.';
+                    });
+                  }
+                },
+                child: const Text(
+                  "Reset Password",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
               ElevatedButton(
                 onPressed: () async {
                   setState(() {
-                    _errorMessage = ''; // Clear previous error message
+                    _errorMessage = '';
                   });
+                  final email = _emailController.text.trim();
+                  final password = _passwordController.text.trim();
+
                   try {
-                    final credential =
-                        await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: _emailController.text.trim(),
-                      password: _passwordController.text.trim(),
+                    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: email,
+                      password: password,
                     );
+
+                    if (credential.user != null && !(credential.user?.emailVerified ?? false)) {
+                      await FirebaseAuth.instance.signOut();
+                      setState(() {
+                        _errorMessage = 'Please verify your email to log in.';
+                      });
+                      return;
+                    }
+
+                    print('Login successful');
+
+                    // Clear input fields
+                    _emailController.clear();
+                    _passwordController.clear();
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -83,6 +138,10 @@ class _LoginScreen extends State<LoginScreen> {
                         _errorMessage = 'An error occurred. Please try again.';
                       }
                     });
+                  } catch (e) {
+                    setState(() {
+                      _errorMessage = 'An error occurred. Please try again.';
+                    });
                   }
                 },
                 child: const Text("Login"),
@@ -92,7 +151,7 @@ class _LoginScreen extends State<LoginScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => RegisterScreen(),
+                      builder: (context) => const RegisterScreen(),
                     ),
                   );
                 },
@@ -163,7 +222,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     _errorMessage,
-                    style: TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
               ElevatedButton(
@@ -195,6 +254,13 @@ class _RegisterScreen extends State<RegisterScreen> {
                       email: email,
                       password: password,
                     );
+
+                    await credential.user?.sendEmailVerification().then((_) {
+                      print('Successfully sent email verification');
+                    }).catchError((onError) {
+                      print('Error sending email verification $onError');
+                    });
+
                     print('Registration successful');
                     Navigator.pop(context); // Navigate back to login page
                   } on FirebaseAuthException catch (e) {
