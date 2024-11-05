@@ -12,23 +12,33 @@ class TaskManager {
   Future<void> addTask(Task task) async {
     tasks.add(task);
     countTasks++;
-    await _firestore.collection(userID).doc(task.id).set(task.toMap());
+    await _firestore.collection('task').doc(userID).set({
+      'tasks': tasks.map((task) => task.toMap()).toList(),
+    });
   }
 
   Future<void> removeTask(Task task) async {
     tasks.remove(task);
-    await _firestore.collection(userID).doc(task.id).delete();
+    await _firestore.collection('task').doc(userID).set({
+      'tasks': tasks.map((task) => task.toMap()).toList(),
+    });
   }
 
   Future<void> updateTask(Task task) async {
     tasks[tasks.indexWhere((element) => element.id == task.id)] = task;
-    await _firestore.collection(userID).doc(task.id).update(task.toMap());
+    await _firestore.collection('task').doc(userID).set({
+      'tasks': tasks.map((task) => task.toMap()).toList(),
+    });
   }
 
   Future<List<Task>> getTasks() async {
-    final querySnapshot = await _firestore.collection(userID).get();
-    tasks = querySnapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
-    countTasks = tasks.length;
+    final docSnapshot = await _firestore.collection('task').doc(userID).get();
+    if (docSnapshot.exists) {
+      tasks = (docSnapshot.data()?['tasks'] as List)
+          .map((taskData) => Task.fromMap(taskData))
+          .toList();
+      countTasks = tasks.length;
+    }
     return tasks;
   }
 
@@ -36,10 +46,7 @@ class TaskManager {
     return countTasks;
   }
 
-  void deleteCollection () async {
-    final querySnapshot = await _firestore.collection(userID).get();
-    for (DocumentSnapshot doc in querySnapshot.docs) {
-      await doc.reference.delete();
-    }
+  void deleteCollection() async {
+    await _firestore.collection('task').doc(userID).delete();
   }
 }
