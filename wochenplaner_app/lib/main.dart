@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
+import 'package:wochenplaner_app/data/userManagement.dart';
 import 'package:wochenplaner_app/widgets/clandarView.dart';
 import 'package:wochenplaner_app/widgets/settingsView.dart';
 import 'package:wochenplaner_app/widgets/taskListView.dart';
 import 'package:wochenplaner_app/theme.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   TaskManager taskManager = TaskManager();
   Settings settings = Settings();
   runApp(MyApp(taskManager: taskManager, settings: settings));
@@ -54,27 +61,16 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),*/
       themeMode: _themeMode,
-      home: MyHomePage(
-        title: 'Flutter Demo Home Page',
-        taskManager: widget.taskManager,
-        toggleThemeMode: toggleThemeMode,
-        settings: widget.settings,
-      ),
+      home: LoginScreen(taskManager: widget.taskManager, settings: widget.settings,toggleThemeMode: toggleThemeMode,) //MyHomePage(taskManager: widget.taskManager, toggleThemeMode: toggleThemeMode, settings: widget.settings,),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage(
-      {super.key,
-      required this.title,
-      required this.taskManager,
-      required this.toggleThemeMode,
-      required this.settings});
+  const MyHomePage({super.key, required this.taskManager, required this.toggleThemeMode, required this.settings});
   final VoidCallback toggleThemeMode;
   final TaskManager taskManager;
   final Settings settings;
-  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();

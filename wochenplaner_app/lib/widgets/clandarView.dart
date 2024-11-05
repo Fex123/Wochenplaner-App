@@ -29,10 +29,11 @@ class _CalendarView extends State<CalendarView> {
         ..addAll(_convertTasksToEvents(widget.taskManager)),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Calender',
+          title: const Text('Calendar',
               style: TextStyle(
                 fontWeight: FontWeight.w900,
               )),
+          automaticallyImplyLeading: false,
         ),
         body: Column(
           children: [

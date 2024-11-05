@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 
@@ -43,6 +45,7 @@ class _SettingsViewState extends State<SettingsView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
@@ -76,6 +79,28 @@ class _SettingsViewState extends State<SettingsView> {
                 ),
               ],
             ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Account Logout'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              FirebaseAuth.instance.currentUser!.delete();
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete Account'),
           ),
         ],
       ),

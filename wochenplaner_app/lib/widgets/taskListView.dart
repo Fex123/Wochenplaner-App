@@ -25,6 +25,7 @@ class _tasklistview extends State<Tasklistview> {
             style: TextStyle(
               fontWeight: FontWeight.w900,
             )),
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: TaskCardList(taskManager: widget.taskManager),
