@@ -32,23 +32,27 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  MaterialTheme mainTheme = const MaterialTheme(Typography.blackCupertino);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Wochenplaner',
-      theme: ThemeData(
+      theme: mainTheme.light(),
+      /* ThemeData(
         brightness: Brightness.light, // Helles Thema
         primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+        colorScheme: MaterialTheme.lightScheme().toColorScheme(),
         scaffoldBackgroundColor: const Color.fromARGB(
             255, 212, 197, 197), // Set dark background color
         useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(),
-      ),
-      darkTheme: ThemeData(
+      ),*/
+      darkTheme: mainTheme.dark(),
+      /*ThemeData(
         brightness: Brightness.dark, // Dunkles Thema
         primarySwatch: Colors.blue,
-      ),
+      ),*/
       themeMode: _themeMode,
       home: MyHomePage(
         title: 'Flutter Demo Home Page',
