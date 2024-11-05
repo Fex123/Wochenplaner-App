@@ -1,16 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:wochenplaner_app/data/settings.dart';
+import 'package:wochenplaner_app/data/settings.dart' as app_settings;
+import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
 
-  final TaskManager taskManager;
-  final Settings settings;
+  final app_settings.Settings settings;
   final VoidCallback toggleThemeMode;
 
-  const LoginScreen({super.key, required this.taskManager, required this.settings, required this.toggleThemeMode});
+  const LoginScreen({super.key, required this.settings, required this.toggleThemeMode});
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
@@ -20,6 +21,28 @@ class _LoginScreen extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = ''; // Variable to hold error messages
+
+  Future<void> setupTaskManager(UserCredential credential) async {
+    final userId = credential.user!.uid;
+    final taskManager = TaskManager(userId);
+
+    try {
+      final querySnapshot = await FirebaseFirestore.instance.collection(userId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        taskManager.tasks = querySnapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
+        taskManager.countTasks = taskManager.tasks.length;
+      } else {
+        await FirebaseFirestore.instance.collection(userId);
+        taskManager.tasks = [];
+        taskManager.countTasks = 0;
+      }
+
+      print("TaskManager initialized with ${taskManager.countTasks} tasks.");
+    } catch (e) {
+      print("Error setting up TaskManager: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,18 +136,19 @@ class _LoginScreen extends State<LoginScreen> {
                       });
                       return;
                     }
-
+                    
+                    await setupTaskManager(credential);
                     print('Login successful');
 
                     // Clear input fields
                     _emailController.clear();
                     _passwordController.clear();
-
+                    TaskManager taskManager = TaskManager(credential.user!.uid);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => MyHomePage(
-                          taskManager: widget.taskManager,
+                          taskManager: taskManager,
                           settings: widget.settings,
                           toggleThemeMode: widget.toggleThemeMode,
                         ),

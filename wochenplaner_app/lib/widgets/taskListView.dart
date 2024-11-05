@@ -56,33 +56,43 @@ class TaskCardList extends StatefulWidget {
 }
 
 class _TaskCardListState extends State<TaskCardList> {
-  late List<Task> tasks;
+  late List<Task> tasks = [];
 
   @override
   void initState() {
     super.initState();
-    tasks = widget.taskManager.getTasks();
+    _loadTasks();
   }
 
-  void refreshTasks() {
+  Future<void> _loadTasks() async {
+    final taskList = await widget.taskManager.getTasks();
     setState(() {
-      tasks = widget.taskManager.getTasks();
+      tasks = taskList;
+    });
+  }
+
+  Future<void> refreshTasks() async {
+    final taskList = await widget.taskManager.getTasks();
+    setState(() {
+      tasks = taskList;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        return TaskCard(
-          task: tasks[index],
-          taskManager: widget.taskManager,
-          onTaskRemoved: refreshTasks,
-          onTaskUpdated: refreshTasks, // Add this callback
-        );
-      },
-    );
+    return tasks.isEmpty
+        ? const Center(child: Text('No tasks available'))
+        : ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              return TaskCard(
+                task: tasks[index],
+                taskManager: widget.taskManager,
+                onTaskRemoved: refreshTasks,
+                onTaskUpdated: refreshTasks,
+              );
+            },
+          );
   }
 }
 
@@ -92,13 +102,13 @@ class TaskCard extends StatefulWidget {
     required this.task,
     required this.taskManager,
     required this.onTaskRemoved,
-    required this.onTaskUpdated, // Add this parameter
+    required this.onTaskUpdated,
   });
 
   final Task task;
   final TaskManager taskManager;
   final VoidCallback onTaskRemoved;
-  final VoidCallback onTaskUpdated; // Add this parameter
+  final VoidCallback onTaskUpdated;
 
   @override
   _TaskCardState createState() => _TaskCardState();

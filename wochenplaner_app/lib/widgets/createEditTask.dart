@@ -166,7 +166,7 @@ class _CreateedittaskState extends State<Createedittask> {
       );
     } else {
       newTask = Task(
-        id: widget.taskManager.getCountTasks(),
+        id: widget.taskManager.getCountTasks().toString(),
         title: taskNameController.text,
         description: taskDescriptionController.text,
         taskDate: selDate,

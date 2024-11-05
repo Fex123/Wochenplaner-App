@@ -2,16 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
+import 'package:wochenplaner_app/data/taskStorage.dart';
 
 class SettingsView extends StatefulWidget {
   final VoidCallback toggleThemeMode;
   final Settings settings;
+  final TaskManager taskManager;
 
-  const SettingsView(
-      {super.key, required this.toggleThemeMode, required this.settings});
+  const SettingsView({super.key, required this.toggleThemeMode, required this.settings, required this.taskManager});
 
   @override
-  _SettingsViewState createState() => _SettingsViewState();
+  State<SettingsView> createState() => _SettingsViewState();
 }
 
 class _SettingsViewState extends State<SettingsView> {
@@ -95,6 +96,7 @@ class _SettingsViewState extends State<SettingsView> {
           ),
           ElevatedButton(
             onPressed: () {
+              widget.taskManager.deleteCollection();
               FirebaseAuth.instance.currentUser!.delete();
               Navigator.pop(context);
             },

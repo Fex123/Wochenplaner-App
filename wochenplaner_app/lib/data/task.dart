@@ -15,7 +15,7 @@ class Task {
 
   //internal attributes
 
-  late int id;
+  late String id;
   bool isCompleted = false;
 
   Task({
@@ -60,7 +60,7 @@ class Task {
   //To-Do: Add a function to set the picture and memory
 
   Task copyWith({
-    int? id,
+    String? id,
     String? title,
     String? description,
     DateTime? taskDate,
@@ -78,5 +78,30 @@ class Task {
       endTime: endTime ?? this.endTime,
       imagePath: imagePath ?? this.imagePath, // Add this line
     )..isCompleted = isCompleted ?? this.isCompleted;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'taskDate': taskDate?.toIso8601String(),
+      'startTime': startTime?.toIso8601String(),
+      'endTime': endTime?.toIso8601String(),
+      'imagePath': imagePath,
+      'isCompleted': isCompleted,
+    };
+  }
+
+  static Task fromMap(Map<String, dynamic> map) {
+    return Task(
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      taskDate: map['taskDate'] != null ? DateTime.parse(map['taskDate']) : null,
+      startTime: map['startTime'] != null ? DateTime.parse(map['startTime']) : null,
+      endTime: map['endTime'] != null ? DateTime.parse(map['endTime']) : null,
+      imagePath: map['imagePath'],
+    )..isCompleted = map['isCompleted'] ?? false;
   }
 }

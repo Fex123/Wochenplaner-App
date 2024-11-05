@@ -23,10 +23,17 @@ class _CalendarView extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    return CalendarControllerProvider(
-      controller: EventController()
-        ..addAll(_convertTasksToEvents(widget.taskManager)),
-      child: Scaffold(
+    return FutureBuilder<List<CalendarEventData>>(
+      future: _convertTasksToEvents(widget.taskManager),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading events'));
+        } else {
+          return CalendarControllerProvider(
+            controller: EventController()..addAll(snapshot.data!),
+            child: Scaffold(
         appBar: AppBar(
           title: StaticComponents.staticAppBar('Calendar'),
           automaticallyImplyLeading: false,
@@ -50,15 +57,16 @@ class _CalendarView extends State<CalendarView> {
               ),
             );
             if (newtask != null) {
-              setState(() {
-                widget.taskManager.addTask(newtask);
-              });
+              // Handle the new task
             }
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.add),
         ),
       ),
+    );
+  }
+      },
     );
   }
 
@@ -92,10 +100,12 @@ class _CalendarView extends State<CalendarView> {
         return DayView(
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
-            onEventTap: (events, date) {
+            onEventTap: (events, date) async {
               if (events.isNotEmpty) {
-                Task task = _getTaskFromEvent(events.first);
+                Task? task = await _getTaskFromEvent(events.first);
+                if(task != null) {
                 _showTaskInfoSheet(context, task);
+              }
               }
             },
             headerStyle: _headerStyle);
@@ -103,27 +113,32 @@ class _CalendarView extends State<CalendarView> {
         return WeekView(
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
-            onEventTap: (events, date) {
+            onEventTap: (events, date) async {
               if (events.isNotEmpty) {
-                Task task = _getTaskFromEvent(events.first);
+                Task? task = await _getTaskFromEvent(events.first);
+                if(task != null) {
                 _showTaskInfoSheet(context, task);
+              }
               }
             },
             headerStyle: _headerStyle);
       case 2:
         return MonthView(
-            onEventTap: (events, date) {
-              Task task = _getTaskFromEvent(events);
-              _showTaskInfoSheet(context, task);
-            },
+            onEventTap: (events, date) async {
+              Task? task = await _getTaskFromEvent(events);
+              if(task != null) {
+                _showTaskInfoSheet(context, task);
+              }
+                        },
             headerStyle: _headerStyle);
       default:
         return Container();
     }
   }
 
-  List<CalendarEventData> _convertTasksToEvents(TaskManager taskManager) {
-    return taskManager.getTasks().where((task) {
+  Future<List<CalendarEventData>> _convertTasksToEvents(TaskManager taskManager) async {
+    final tasks = await taskManager.getTasks();
+    return tasks.where((task) {
       return task.taskDate != null &&
           task.startTime != null &&
           task.endTime != null;
@@ -157,10 +172,17 @@ class _CalendarView extends State<CalendarView> {
     }).toList();
   }
 
-  Task _getTaskFromEvent(CalendarEventData event) {
-    return widget.taskManager
-        .getTasks()
-        .firstWhere((task) => task.eventData == event);
+  Future<Task?> _getTaskFromEvent(CalendarEventData event) async {
+    final tasks = await widget.taskManager.getTasks();
+    for (var task in tasks) {
+      if (task.taskDate == event.date &&
+          task.startTime == event.startTime &&
+          task.endTime == event.endTime &&
+          task.title == event.title) {
+        return task;
+      }
+    }
+    return null; // Return null if the task is not found
   }
 
   bool isTaskLate(Task task) {

@@ -15,15 +15,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  TaskManager taskManager = TaskManager();
   Settings settings = Settings();
-  runApp(MyApp(taskManager: taskManager, settings: settings));
+  runApp(MyApp( settings: settings));
 }
 
 class MyApp extends StatefulWidget {
-  final TaskManager taskManager;
   final Settings settings;
-  const MyApp({super.key, required this.taskManager, required this.settings});
+  const MyApp({super.key, required this.settings});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -54,7 +52,6 @@ class _MyAppState extends State<MyApp> {
         darkTheme: mainTheme.dark(),
         themeMode: _themeMode,
         home: LoginScreen(
-          taskManager: widget.taskManager,
           settings: widget.settings,
           toggleThemeMode: toggleThemeMode,
         ) //MyHomePage(taskManager: widget.taskManager, toggleThemeMode: toggleThemeMode, settings: widget.settings,),
@@ -100,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? SettingsView(
                         toggleThemeMode: widget.toggleThemeMode,
                         settings: widget.settings,
+                        taskManager: widget.taskManager,
                       )
                     : Container(),
       ),
