@@ -29,7 +29,10 @@ class _CalendarView extends State<CalendarView> {
         ..addAll(_convertTasksToEvents(widget.taskManager)),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Kalenderansicht'),
+          title: const Text('Calender',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+              )),
         ),
         body: Column(
           children: [
@@ -56,6 +59,7 @@ class _CalendarView extends State<CalendarView> {
             }
           },
           child: const Icon(Icons.add),
+          shape: const CircleBorder(),
         ),
       ),
     );
@@ -80,37 +84,44 @@ class _CalendarView extends State<CalendarView> {
     );
   }
 
+  final HeaderStyle _headerStyle = const HeaderStyle(
+      decoration: BoxDecoration(
+    color: Colors.white,
+  ));
+
   Widget _buildCalendarView(Settings settings) {
     switch (_selectedViewIndex) {
       case 0:
         return DayView(
-          startHour: settings.getStartHour(),
-          endHour: settings.getEndHour(),
-          onEventTap: (events, date) {
-            if (events.isNotEmpty) {
-              Task task = _getTaskFromEvent(events.first);
-              _showTaskInfoSheet(context, task);
-            }
-          },
-        );
+            startHour: settings.getStartHour(),
+            endHour: settings.getEndHour(),
+            onEventTap: (events, date) {
+              if (events.isNotEmpty) {
+                Task task = _getTaskFromEvent(events.first);
+                _showTaskInfoSheet(context, task);
+              }
+            },
+            headerStyle: _headerStyle);
       case 1:
         return WeekView(
-          startHour: settings.getStartHour(),
-          endHour: settings.getEndHour(),
-          onEventTap: (events, date) {
-            if (events.isNotEmpty) {
-              Task task = _getTaskFromEvent(events.first);
-              _showTaskInfoSheet(context, task);
-            }
-          },
-        );
+            startHour: settings.getStartHour(),
+            endHour: settings.getEndHour(),
+            onEventTap: (events, date) {
+              if (events.isNotEmpty) {
+                Task task = _getTaskFromEvent(events.first);
+                _showTaskInfoSheet(context, task);
+              }
+            },
+            headerStyle: _headerStyle);
       case 2:
-        return MonthView(onEventTap: (events, date) {
-          if (events != null) {
-            Task task = _getTaskFromEvent(events);
-            _showTaskInfoSheet(context, task);
-          }
-        });
+        return MonthView(
+            onEventTap: (events, date) {
+              if (events != null) {
+                Task task = _getTaskFromEvent(events);
+                _showTaskInfoSheet(context, task);
+              }
+            },
+            headerStyle: _headerStyle);
       default:
         return Container();
     }

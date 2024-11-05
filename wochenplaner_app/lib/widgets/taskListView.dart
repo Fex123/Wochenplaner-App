@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
 import '../../data/Task.dart';
@@ -20,7 +21,10 @@ class _tasklistview extends State<Tasklistview> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Task Liste'),
+        title: const Text('Tasks',
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+            )),
       ),
       body: Center(
         child: TaskCardList(taskManager: widget.taskManager),
@@ -42,6 +46,7 @@ class _tasklistview extends State<Tasklistview> {
           }
         },
         child: const Icon(Icons.add),
+        shape: const CircleBorder(),
       ),
     );
   }

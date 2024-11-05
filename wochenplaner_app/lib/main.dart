@@ -4,6 +4,8 @@ import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/clandarView.dart';
 import 'package:wochenplaner_app/widgets/settingsView.dart';
 import 'package:wochenplaner_app/widgets/taskListView.dart';
+import 'package:wochenplaner_app/theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   TaskManager taskManager = TaskManager();
@@ -23,9 +25,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.light;
 
-  void toggleThemeMode (){
+  void toggleThemeMode() {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
@@ -40,19 +43,30 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: const Color.fromARGB(
             255, 212, 197, 197), // Set dark background color
         useMaterial3: true,
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark, // Dunkles Thema
         primarySwatch: Colors.blue,
       ),
       themeMode: _themeMode,
-      home: MyHomePage(title: 'Flutter Demo Home Page', taskManager: widget.taskManager, toggleThemeMode: toggleThemeMode, settings: widget.settings,),
+      home: MyHomePage(
+        title: 'Flutter Demo Home Page',
+        taskManager: widget.taskManager,
+        toggleThemeMode: toggleThemeMode,
+        settings: widget.settings,
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.taskManager, required this.toggleThemeMode, required this.settings});
+  const MyHomePage(
+      {super.key,
+      required this.title,
+      required this.taskManager,
+      required this.toggleThemeMode,
+      required this.settings});
   final VoidCallback toggleThemeMode;
   final TaskManager taskManager;
   final Settings settings;
@@ -74,15 +88,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-      Center(
+      body: Center(
         child: _selectedId == 0
-        ? Tasklistview(taskManager: widget.taskManager) 
-        : _selectedId == 1
-          ? CalendarView(taskManager: widget.taskManager,settings: widget.settings,)
-          : _selectedId == 2
-            ? SettingsView(toggleThemeMode: widget.toggleThemeMode,settings: widget.settings,)
-            : Container(),
+            ? Tasklistview(taskManager: widget.taskManager)
+            : _selectedId == 1
+                ? CalendarView(
+                    taskManager: widget.taskManager,
+                    settings: widget.settings,
+                  )
+                : _selectedId == 2
+                    ? SettingsView(
+                        toggleThemeMode: widget.toggleThemeMode,
+                        settings: widget.settings,
+                      )
+                    : Container(),
       ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
@@ -101,10 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              _onItemTapped(2);
-            },
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                _onItemTapped(2);
+              },
             ),
           ],
         ),
