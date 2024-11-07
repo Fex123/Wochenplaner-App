@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="wochenplaner_app"
+        android:label="Tasx"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
