@@ -56,7 +56,9 @@ class _SettingsViewState extends State<SettingsView> {
             padding: const EdgeInsets.all(10.0),
             child: CustomSwitch(
                 toggleState: widget.toggleThemeMode,
-                description: 'Activate dark mode'),
+                description: 'Activate dark mode',
+                settings: widget.settings,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -115,17 +117,20 @@ class _SettingsViewState extends State<SettingsView> {
 class CustomSwitch extends StatefulWidget {
   final VoidCallback toggleState;
   final String description;
+  final Settings settings;
 
-  const CustomSwitch(
-      {super.key, required this.toggleState, required this.description});
+  const CustomSwitch({
+    super.key, 
+    required this.toggleState, 
+    required this.description, 
+    required this.settings,
+  });
 
   @override
   State<CustomSwitch> createState() => _CustomSwitchState();
 }
 
 class _CustomSwitchState extends State<CustomSwitch> {
-  bool darkTheme = false;
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -135,11 +140,11 @@ class _CustomSwitchState extends State<CustomSwitch> {
         Switch(
           onChanged: (bool value) {
             setState(() {
-              darkTheme = value;
+              widget.settings.setDarkMode(value);
               widget.toggleState();
             });
           },
-          value: darkTheme,
+          value: widget.settings.isDarkMode(),
         ),
       ],
     );

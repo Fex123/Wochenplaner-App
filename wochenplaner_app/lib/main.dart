@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
@@ -16,12 +17,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Settings settings = Settings();
-  runApp(MyApp( settings: settings));
+  User? user = FirebaseAuth.instance.currentUser;
+  runApp(MyApp(settings: settings, isLoggedIn: user != null));
 }
 
 class MyApp extends StatefulWidget {
   final Settings settings;
-  const MyApp({super.key, required this.settings});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.settings, required this.isLoggedIn});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -47,15 +50,21 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     mainTheme = MaterialTheme(textTheme);
     return MaterialApp(
-        title: 'Wochenplaner',
-        theme: mainTheme.light(),
-        darkTheme: mainTheme.dark(),
-        themeMode: _themeMode,
-        home: LoginScreen(
-          settings: widget.settings,
-          toggleThemeMode: toggleThemeMode,
-        ) //MyHomePage(taskManager: widget.taskManager, toggleThemeMode: toggleThemeMode, settings: widget.settings,),
-        );
+      title: 'Wochenplaner',
+      theme: mainTheme.light(),
+      darkTheme: mainTheme.dark(),
+      themeMode: _themeMode,
+      home: widget.isLoggedIn
+          ? MyHomePage(
+              taskManager: TaskManager(FirebaseAuth.instance.currentUser!.uid),
+              toggleThemeMode: toggleThemeMode,
+              settings: widget.settings,
+            )
+          : LoginScreen(
+              settings: widget.settings,
+              toggleThemeMode: toggleThemeMode,
+            ),
+    );
   }
 }
 
