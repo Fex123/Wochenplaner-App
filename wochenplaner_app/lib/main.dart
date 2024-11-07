@@ -6,7 +6,7 @@ import 'package:wochenplaner_app/data/userManagement.dart';
 import 'package:wochenplaner_app/widgets/clandarView.dart';
 import 'package:wochenplaner_app/widgets/settingsView.dart';
 import 'package:wochenplaner_app/widgets/taskListView.dart';
-import 'package:wochenplaner_app/theme.dart';
+import 'package:wochenplaner_app/altTheme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';

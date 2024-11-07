@@ -9,7 +9,8 @@ class AppColors {
   static const Color notStarted =
       Color.fromARGB(255, 107, 107, 107); // Not started color
   static const Color onNotStarted = Color.fromARGB(255, 255, 255, 255);
-  static const Color done = Color.fromRGBO(0, 141, 50, 1); // Done color
+  static const Color done =
+      Color(0xFF00BDE8); // Color.fromRGBO(0, 141, 50, 1); // Done color
   static const Color onDone = Color.fromARGB(255, 255, 255, 255);
 }
 
