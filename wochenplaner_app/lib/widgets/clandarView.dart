@@ -34,38 +34,38 @@ class _CalendarView extends State<CalendarView> {
           return CalendarControllerProvider(
             controller: EventController()..addAll(snapshot.data!),
             child: Scaffold(
-        appBar: AppBar(
-          title: StaticComponents.staticAppBar('Calendar'),
-          automaticallyImplyLeading: false,
-        ),
-        body: Column(
-          children: [
-            _buildSegmentedControl(),
-            Expanded(
-              child: _buildCalendarView(widget.settings),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            Task? newtask = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Createedittask(
-                  taskManager: widget.taskManager,
-                ),
+              appBar: AppBar(
+                title: StaticComponents.staticAppBar('Calendar', context),
+                automaticallyImplyLeading: false,
               ),
-            );
-            if (newtask != null) {
-              // Handle the new task
-            }
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
+              body: Column(
+                children: [
+                  _buildSegmentedControl(),
+                  Expanded(
+                    child: _buildCalendarView(widget.settings),
+                  ),
+                ],
+              ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  Task? newtask = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Createedittask(
+                        taskManager: widget.taskManager,
+                      ),
+                    ),
+                  );
+                  if (newtask != null) {
+                    // Handle the new task
+                  }
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add),
+              ),
+            ),
+          );
+        }
       },
     );
   }
@@ -103,9 +103,9 @@ class _CalendarView extends State<CalendarView> {
             onEventTap: (events, date) async {
               if (events.isNotEmpty) {
                 Task? task = await _getTaskFromEvent(events.first);
-                if(task != null) {
-                _showTaskInfoSheet(context, task);
-              }
+                if (task != null) {
+                  _showTaskInfoSheet(context, task);
+                }
               }
             },
             headerStyle: _headerStyle);
@@ -116,9 +116,9 @@ class _CalendarView extends State<CalendarView> {
             onEventTap: (events, date) async {
               if (events.isNotEmpty) {
                 Task? task = await _getTaskFromEvent(events.first);
-                if(task != null) {
-                _showTaskInfoSheet(context, task);
-              }
+                if (task != null) {
+                  _showTaskInfoSheet(context, task);
+                }
               }
             },
             headerStyle: _headerStyle);
@@ -126,17 +126,18 @@ class _CalendarView extends State<CalendarView> {
         return MonthView(
             onEventTap: (events, date) async {
               Task? task = await _getTaskFromEvent(events);
-              if(task != null) {
+              if (task != null) {
                 _showTaskInfoSheet(context, task);
               }
-                        },
+            },
             headerStyle: _headerStyle);
       default:
         return Container();
     }
   }
 
-  Future<List<CalendarEventData>> _convertTasksToEvents(TaskManager taskManager) async {
+  Future<List<CalendarEventData>> _convertTasksToEvents(
+      TaskManager taskManager) async {
     final tasks = await taskManager.getTasks();
     return tasks.where((task) {
       return task.taskDate != null &&

@@ -9,18 +9,20 @@ class AppColors {
   static const Color notStarted =
       Color.fromARGB(255, 107, 107, 107); // Not started color
   static const Color onNotStarted = Color.fromARGB(255, 255, 255, 255);
-  static const Color done = Color(0xFF008D32); // Done color
+  static const Color done = Color.fromRGBO(0, 141, 50, 1); // Done color
   static const Color onDone = Color.fromARGB(255, 255, 255, 255);
 }
 
 class StaticComponents {
-  static staticAppBar(String title) {
+  static staticAppBar(String title, BuildContext context) {
     return AppBar(
       title: Text(title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-          )),
+          style: TextStyle(
+              fontWeight: FontWeight.w900,
+              //fontFamily: 'monosquare'
+              color: Theme.of(context).colorScheme.onPrimaryFixed)),
       automaticallyImplyLeading: false,
+      backgroundColor: Theme.of(context).colorScheme.primaryFixed,
     );
   }
 }

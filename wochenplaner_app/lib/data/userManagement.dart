@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart' as app_settings;
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/main.dart';
+import 'package:wochenplaner_app/staticAppVariables.dart';
 
 class LoginScreen extends StatefulWidget {
-
   final app_settings.Settings settings;
   final VoidCallback toggleThemeMode;
 
-  const LoginScreen({super.key, required this.settings, required this.toggleThemeMode});
+  const LoginScreen(
+      {super.key, required this.settings, required this.toggleThemeMode});
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
@@ -23,9 +24,7 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: StaticComponents.staticAppBar('Settings', context),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -45,7 +44,8 @@ class _LoginScreen extends State<LoginScreen> {
                   obscureText: true,
                 ),
               ),
-              if (_errorMessage.isNotEmpty) // Display error message if not empty
+              if (_errorMessage
+                  .isNotEmpty) // Display error message if not empty
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -65,9 +65,11 @@ class _LoginScreen extends State<LoginScreen> {
                   }
 
                   try {
-                    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+                    await FirebaseAuth.instance
+                        .sendPasswordResetEmail(email: email);
                     setState(() {
-                      _errorMessage = 'Password reset email sent. Please check your inbox.';
+                      _errorMessage =
+                          'Password reset email sent. Please check your inbox.';
                     });
                   } on FirebaseAuthException catch (e) {
                     setState(() {
@@ -100,12 +102,14 @@ class _LoginScreen extends State<LoginScreen> {
                   final password = _passwordController.text.trim();
 
                   try {
-                    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    final credential =
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
                       email: email,
                       password: password,
                     );
 
-                    if (credential.user != null && !(credential.user?.emailVerified ?? false)) {
+                    if (credential.user != null &&
+                        !(credential.user?.emailVerified ?? false)) {
                       await FirebaseAuth.instance.signOut();
                       setState(() {
                         _errorMessage = 'Please verify your email to log in.';
@@ -169,7 +173,6 @@ class _LoginScreen extends State<LoginScreen> {
 }
 
 class RegisterScreen extends StatefulWidget {
-
   const RegisterScreen({super.key});
 
   @override
@@ -179,7 +182,8 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreen extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   String _errorMessage = ''; // Variable to hold error messages
 
   @override
@@ -193,12 +197,12 @@ class _RegisterScreen extends State<RegisterScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InputBox(
-                  labelText: "Insert Email",
-                  controller: _emailController,
-                  obscureText: false,
-                )),
+                  padding: const EdgeInsets.all(8.0),
+                  child: InputBox(
+                    labelText: "Insert Email",
+                    controller: _emailController,
+                    obscureText: false,
+                  )),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InputBox(
@@ -215,7 +219,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                   obscureText: true,
                 ),
               ),
-              if (_errorMessage.isNotEmpty) // Display error message if not empty
+              if (_errorMessage
+                  .isNotEmpty) // Display error message if not empty
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -230,7 +235,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                   });
                   final email = _emailController.text.trim();
                   final password = _passwordController.text.trim();
-                  final confirmPassword = _confirmPasswordController.text.trim();
+                  final confirmPassword =
+                      _confirmPasswordController.text.trim();
 
                   if (!_isValidEmail(email)) {
                     setState(() {
@@ -266,7 +272,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                       if (e.code == 'weak-password') {
                         _errorMessage = 'The password provided is too weak.';
                       } else if (e.code == 'email-already-in-use') {
-                        _errorMessage = 'The account already exists for that email.';
+                        _errorMessage =
+                            'The account already exists for that email.';
                       } else {
                         _errorMessage = 'An error occurred. Please try again.';
                       }

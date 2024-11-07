@@ -9,7 +9,11 @@ class SettingsView extends StatefulWidget {
   final Settings settings;
   final TaskManager taskManager;
 
-  const SettingsView({super.key, required this.toggleThemeMode, required this.settings, required this.taskManager});
+  const SettingsView(
+      {super.key,
+      required this.toggleThemeMode,
+      required this.settings,
+      required this.taskManager});
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -49,15 +53,15 @@ class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: StaticComponents.staticAppBar('Settings'),
+      appBar: StaticComponents.staticAppBar('Settings', context),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: CustomSwitch(
-                toggleState: widget.toggleThemeMode,
-                description: 'Activate dark mode',
-                settings: widget.settings,
+              toggleState: widget.toggleThemeMode,
+              description: 'Activate dark mode',
+              settings: widget.settings,
             ),
           ),
           Padding(
@@ -120,9 +124,9 @@ class CustomSwitch extends StatefulWidget {
   final Settings settings;
 
   const CustomSwitch({
-    super.key, 
-    required this.toggleState, 
-    required this.description, 
+    super.key,
+    required this.toggleState,
+    required this.description,
     required this.settings,
   });
 

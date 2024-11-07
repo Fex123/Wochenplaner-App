@@ -19,7 +19,8 @@ class _tasklistview extends State<Tasklistview> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: StaticComponents.staticAppBar('Tasks'),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: StaticComponents.staticAppBar('Tasks', context),
       body: Center(
         child: TaskCardList(taskManager: widget.taskManager),
       ),
@@ -240,24 +241,29 @@ class _TaskCardState extends State<TaskCard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      widget.task.title,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isChecked
-                            ? AppColors.onDone
-                            : isTaskLate(widget.task)
-                                ? AppColors.late.light.onColor // Late
-                                : isTaskInProgress(widget.task)
-                                    ? AppColors
-                                        .inProgress.light.onColor // In Progress
-                                    : AppColors.onNotStarted,
-                        decoration: isChecked
-                            ? TextDecoration.lineThrough
-                            : TextDecoration.none,
+                    Expanded(
+                      child: Text(
+                        widget.task.title,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: isChecked
+                              ? AppColors.onDone
+                              : isTaskLate(widget.task)
+                                  ? AppColors.late.light.onColor // Late
+                                  : isTaskInProgress(widget.task)
+                                      ? AppColors.inProgress.light
+                                          .onColor // In Progress
+                                      : AppColors.onNotStarted,
+                          decoration: isChecked
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                          decorationColor:
+                              isChecked ? Colors.white : Colors.transparent,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     Checkbox(
                       value: isChecked,
@@ -288,8 +294,9 @@ class _TaskCardState extends State<TaskCard> {
                 widget.task.startTime != null &&
                 widget.task.endTime != null)
               Card(
-                color: Colors
-                    .white, // TODO: Replace with Theme Color for Container
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer, // TODO: Replace with Theme Color for Container
                 margin: const EdgeInsets.only(
                     top: 0, bottom: 10), // Zero margin only at the top
                 shape: const RoundedRectangleBorder(
@@ -303,10 +310,11 @@ class _TaskCardState extends State<TaskCard> {
                   alignment: Alignment.center,
                   child: Text(
                     '${DateFormat.yMMMd().format(widget.task.taskDate!)}\n${formatTime(true)} - ${formatTime(false)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
-                      color: Colors
-                          .black, //TODO: Replace with Theme Color for OnContainer
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer, //TODO: Replace with Theme Color for OnContainer
                     ),
                     textAlign: TextAlign.center,
                   ),

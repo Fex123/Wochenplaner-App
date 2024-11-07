@@ -111,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     : Container(),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Theme.of(context).colorScheme.primaryFixed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -119,18 +120,21 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 _onItemTapped(0);
               },
+              color: Theme.of(context).colorScheme.onPrimaryFixed,
             ),
             IconButton(
               icon: const Icon(Icons.calendar_today),
               onPressed: () {
                 _onItemTapped(1);
               },
+              color: Theme.of(context).colorScheme.onPrimaryFixed,
             ),
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
                 _onItemTapped(2);
               },
+              color: Theme.of(context).colorScheme.onPrimaryFixed,
             ),
           ],
         ),
