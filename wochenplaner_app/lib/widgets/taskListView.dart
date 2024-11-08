@@ -16,13 +16,28 @@ class Tasklistview extends StatefulWidget {
 }
 
 class _tasklistview extends State<Tasklistview> {
+  String searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: StaticComponents.staticAppBar('Tasks', context),
+      appBar: AppBar(
+        title: const Text('Tasks'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: TaskSearchDelegate(widget.taskManager),
+              );
+            },
+          ),
+        ],
+      ),
       body: Center(
-        child: TaskCardList(taskManager: widget.taskManager),
+        child: TaskCardList(taskManager: widget.taskManager, searchQuery: searchQuery),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -48,9 +63,10 @@ class _tasklistview extends State<Tasklistview> {
 }
 
 class TaskCardList extends StatefulWidget {
-  const TaskCardList({super.key, required this.taskManager});
+  const TaskCardList({super.key, required this.taskManager, required this.searchQuery});
 
   final TaskManager taskManager;
+  final String searchQuery;
 
   @override
   _TaskCardListState createState() => _TaskCardListState();
@@ -81,13 +97,17 @@ class _TaskCardListState extends State<TaskCardList> {
 
   @override
   Widget build(BuildContext context) {
-    return tasks.isEmpty
+    final filteredTasks = tasks.where((task) {
+      return task.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
+    }).toList();
+
+    return filteredTasks.isEmpty
         ? const Center(child: Text('No tasks available'))
         : ListView.builder(
-            itemCount: tasks.length,
+            itemCount: filteredTasks.length,
             itemBuilder: (context, index) {
               return TaskCard(
-                task: tasks[index],
+                task: filteredTasks[index],
                 taskManager: widget.taskManager,
                 onTaskRemoved: refreshTasks,
                 onTaskUpdated: refreshTasks,
@@ -324,5 +344,43 @@ class _TaskCardState extends State<TaskCard> {
         ),
       ),
     );
+  }
+}
+
+class TaskSearchDelegate extends SearchDelegate {
+  final TaskManager taskManager;
+
+  TaskSearchDelegate(this.taskManager);
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return TaskCardList(taskManager: taskManager, searchQuery: query);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return TaskCardList(taskManager: taskManager, searchQuery: query);
   }
 }
