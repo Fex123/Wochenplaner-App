@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
+import 'package:wochenplaner_app/data/userManagement.dart'; // Add this import
 
 class SettingsView extends StatefulWidget {
   final VoidCallback toggleThemeMode;
@@ -92,7 +93,17 @@ class _SettingsViewState extends State<SettingsView> {
           ElevatedButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
-              Navigator.pop(context);
+              if (widget.settings.getAutoLogin()) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LoginScreen(
+                              settings: widget.settings,
+                              toggleThemeMode: widget.toggleThemeMode,
+                            )));
+              } else {
+                Navigator.pop(context);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

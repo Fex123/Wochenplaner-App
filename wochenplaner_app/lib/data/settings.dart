@@ -2,7 +2,14 @@ class Settings {
   int startHour = 0;
   int endHour = 24;
   bool _isDarkMode = false;
-
+  bool autoLogin = false;
+  
+  void setAutoLogin(bool value) {
+    autoLogin = value;
+  }
+  bool getAutoLogin() {
+    return autoLogin;
+  }
   void setStartHour(int hour) {
     startHour = hour;
   }

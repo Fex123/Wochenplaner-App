@@ -18,6 +18,9 @@ void main() async {
   );
   Settings settings = Settings();
   User? user = FirebaseAuth.instance.currentUser;
+  if(user != null) {
+    settings.setAutoLogin(true);
+  }
   runApp(MyApp(settings: settings, isLoggedIn: user != null));
 }
 
