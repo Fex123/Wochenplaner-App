@@ -5,6 +5,7 @@ import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'dart:io'; // Add this import
 import 'package:image_picker/image_picker.dart'; // Add this import
 import 'package:wochenplaner_app/notification.dart'; // Add this import
+import 'package:wochenplaner_app/staticAppVariables.dart'; // Add this import
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
@@ -332,49 +333,11 @@ class TaskTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double borderRadius = 20.0;
     return SizedBox(
       width: 125 * (widthMultiplyer ?? 1),
       child: TextField(
         controller: controller,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Theme.of(context).colorScheme.primaryContainer,
-          // Background color
-          border: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(borderRadius), // Rounded corners
-
-            borderSide: const BorderSide(
-              color: Color.fromARGB(0, 33, 149, 243), // Border color
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(borderRadius), // Rounded corners
-
-            borderSide: const BorderSide(
-              color:
-                  Color.fromARGB(0, 33, 149, 243), // Border color when enabled
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(borderRadius), // Rounded corners
-
-            borderSide: BorderSide(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onPrimaryContainer, // Border color when focused
-            ),
-          ),
-          labelText: labelText,
-          labelStyle: TextStyle(
-            color: Theme.of(context)
-                .colorScheme
-                .onPrimaryContainer, // Label text color
-          ),
-        ),
+        decoration: StaticStyles.appInputDecoration(context, labelText),
         maxLength: maxInputLength,
         maxLines: lines,
       ),
@@ -546,6 +509,7 @@ class _saveButtonState extends State<SaveButton> {
       onPressed: () {
         widget.saveTask();
       },
+      style: StaticStyles.appButtonStyle(context),
       child: const Text('Save'),
     );
   }
@@ -559,6 +523,7 @@ class CancelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      style: StaticStyles.appButtonStyle(context),
       onPressed: onPressed,
       child: const Text('Cancel'),
     );

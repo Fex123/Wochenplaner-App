@@ -51,7 +51,7 @@ class _LoginScreen extends State<LoginScreen> {
                   child: Text(
                     _errorMessage,
                     style:
-                        TextStyle(color: Theme.of(context).colorScheme.onError),
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                 ),
               GestureDetector(
@@ -89,77 +89,87 @@ class _LoginScreen extends State<LoginScreen> {
                 child: Text(
                   "Reset Password",
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+                    color: Theme.of(context).colorScheme.onSurface,
                     decoration: TextDecoration.underline,
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  setState(() {
-                    _errorMessage = '';
-                  });
-                  final email = _emailController.text.trim();
-                  final password = _passwordController.text.trim();
-
-                  try {
-                    final credential =
-                        await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-
-                    if (credential.user != null &&
-                        !(credential.user?.emailVerified ?? false)) {
-                      await FirebaseAuth.instance.signOut();
+              Padding(
+                  padding: const EdgeInsets.only(top: 30.0),
+                  child: ElevatedButton(
+                    style: StaticStyles.appButtonStyle(context),
+                    onPressed: () async {
                       setState(() {
-                        _errorMessage = 'Please verify your email to log in.';
+                        _errorMessage = '';
                       });
-                      return;
-                    }
-                    print('Login successful');
+                      final email = _emailController.text.trim();
+                      final password = _passwordController.text.trim();
 
-                    // Clear input fields
-                    _emailController.clear();
-                    _passwordController.clear();
-                    TaskManager taskManager = TaskManager(credential.user!.uid);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyHomePage(
-                          taskManager: taskManager,
-                          settings: widget.settings,
-                          toggleThemeMode: widget.toggleThemeMode,
-                        ),
-                      ),
-                    );
-                  } on FirebaseAuthException catch (e) {
-                    setState(() {
-                      if (e.code == 'invalid-credential') {
-                        _errorMessage = 'User or password is incorrect.';
-                      } else {
-                        _errorMessage = 'An error occurred. Please try again.';
+                      try {
+                        final credential = await FirebaseAuth.instance
+                            .signInWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
+
+                        if (credential.user != null &&
+                            !(credential.user?.emailVerified ?? false)) {
+                          await FirebaseAuth.instance.signOut();
+                          setState(() {
+                            _errorMessage =
+                                'Please verify your email to log in.';
+                          });
+                          return;
+                        }
+                        print('Login successful');
+
+                        // Clear input fields
+                        _emailController.clear();
+                        _passwordController.clear();
+                        TaskManager taskManager =
+                            TaskManager(credential.user!.uid);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyHomePage(
+                              taskManager: taskManager,
+                              settings: widget.settings,
+                              toggleThemeMode: widget.toggleThemeMode,
+                            ),
+                          ),
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        setState(() {
+                          if (e.code == 'invalid-credential') {
+                            _errorMessage = 'User or password is incorrect.';
+                          } else {
+                            _errorMessage =
+                                'An error occurred. Please try again.';
+                          }
+                        });
+                      } catch (e) {
+                        setState(() {
+                          _errorMessage =
+                              'An error occurred. Please try again.';
+                        });
                       }
-                    });
-                  } catch (e) {
-                    setState(() {
-                      _errorMessage = 'An error occurred. Please try again.';
-                    });
-                  }
-                },
-                child: const Text("Login"),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Register"),
-              ),
+                    },
+                    child: const Text("Login"),
+                  )),
+              Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: ElevatedButton(
+                    style: StaticStyles.appButtonStyle(context),
+                    onPressed: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("Register"),
+                  ))
             ],
           ),
         ),
@@ -231,6 +241,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                   ),
                 ),
               ElevatedButton(
+                style: StaticStyles.appButtonStyle(context),
                 onPressed: () async {
                   setState(() {
                     _errorMessage = ''; // Clear previous error message

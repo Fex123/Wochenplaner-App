@@ -1,5 +1,6 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
@@ -94,11 +95,11 @@ class _CalendarView extends State<CalendarView> {
         ),
         rightIconConfig: IconDataConfig(
           color: Theme.of(context).colorScheme.onSurface,
-          size: 100,
+          size: 30,
         ),
         leftIconConfig: IconDataConfig(
           color: Theme.of(context).colorScheme.onSurface,
-          size: 100,
+          size: 30,
         ));
 
     switch (_selectedViewIndex) {
@@ -139,41 +140,46 @@ class _CalendarView extends State<CalendarView> {
             headerStyle: headerStyle);
       case 1:
         return WeekView(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            startHour: settings.getStartHour(),
-            endHour: settings.getEndHour(),
-            onDateTap: (date) async {
-              Task? newTask = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Createedittask(
-                    taskManager: widget.taskManager,
-                    taskToEdit: Task(
-                      id: widget.taskManager.getCountTasks().toString(),
-                      title: '',
-                      taskDate: date,
-                      startTime: date,
-                    ),
+          heightPerMinute: 1,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          startHour: settings.getStartHour(),
+          endHour: settings.getEndHour(),
+          onDateTap: (date) async {
+            Task? newTask = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Createedittask(
+                  taskManager: widget.taskManager,
+                  taskToEdit: Task(
+                    id: widget.taskManager.getCountTasks().toString(),
+                    title: '',
+                    taskDate: date,
+                    startTime: date,
                   ),
                 ),
-              );
-              if (newTask != null) {
-                setState(() {
-                  widget.taskManager.addTask(newTask);
-                });
+              ),
+            );
+            if (newTask != null) {
+              setState(() {
+                widget.taskManager.addTask(newTask);
+              });
+            }
+          },
+          onEventTap: (events, date) async {
+            if (events.isNotEmpty) {
+              Task? task = await _getTaskFromEvent(events.first);
+              if (task != null) {
+                _showTaskInfoSheet(context, task);
               }
-            },
-            onEventTap: (events, date) async {
-              if (events.isNotEmpty) {
-                Task? task = await _getTaskFromEvent(events.first);
-                if (task != null) {
-                  _showTaskInfoSheet(context, task);
-                }
-              }
-            },
+            }
+          },
 
-            // This Code-Snippet can
-            headerStyle: headerStyle);
+          // This Code-Snippet can
+          headerStyle: headerStyle,
+          headerStringBuilder: (date, {secondaryDate}) {
+            return '${DateFormat('dd.MM').format(date)}     -     ${DateFormat('dd.MM').format(secondaryDate!)}';
+          },
+        );
       case 2:
         return MonthView(
             onCellTap: (date, events) async {
@@ -230,7 +236,7 @@ class _CalendarView extends State<CalendarView> {
                     ? AppColors.inProgress.value
                     : AppColors.notStarted))),
         titleStyle: TextStyle(
-            fontSize: 15,
+            fontSize: 10,
             color: (task.isCompleted
                 ? AppColors.onDone
                 : (isTaskLate(task)
