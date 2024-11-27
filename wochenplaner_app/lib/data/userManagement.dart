@@ -50,7 +50,8 @@ class _LoginScreen extends State<LoginScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     _errorMessage,
-                    style: const TextStyle(color: Colors.red),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.onError),
                   ),
                 ),
               GestureDetector(
@@ -85,10 +86,10 @@ class _LoginScreen extends State<LoginScreen> {
                     });
                   }
                 },
-                child: const Text(
+                child: Text(
                   "Reset Password",
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                     decoration: TextDecoration.underline,
                   ),
                 ),
@@ -225,7 +226,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     _errorMessage,
-                    style: const TextStyle(color: Colors.red),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.onError),
                   ),
                 ),
               ElevatedButton(

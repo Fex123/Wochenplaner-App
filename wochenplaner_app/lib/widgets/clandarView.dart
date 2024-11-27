@@ -32,37 +32,37 @@ class _CalendarView extends State<CalendarView> {
           return Center(child: Text('Error loading events'));
         } else {
           return Scaffold(
+              appBar: StaticComponents.staticAppBar('Calendar', context),
               body: CalendarControllerProvider(
-            controller: EventController()..addAll(snapshot.data!),
-            child: Scaffold(
-              appBar: AppBar(
-                title: StaticComponents.staticAppBar('Calendar', context),
-                automaticallyImplyLeading: false,
-              ),
-              body: Column(
-                children: [
-                  _buildSegmentedControl(),
-                  Expanded(
-                    child: _buildCalendarView(widget.settings),
-                  ),
-                ],
-              ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () async {
-                  Task? newtask = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Createedittask(
-                        taskManager: widget.taskManager,
+                controller: EventController()..addAll(snapshot.data!),
+                child: Scaffold(
+                  body: Column(
+                    children: [
+                      _buildSegmentedControl(),
+                      Expanded(
+                        child: _buildCalendarView(widget.settings),
                       ),
-                    ),
-                  );
-                },
-                shape: const CircleBorder(),
-                child: const Icon(Icons.add),
-              ),
-            ),
-          ));
+                    ],
+                  ),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: () async {
+                      Task? newtask = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Createedittask(
+                            taskManager: widget.taskManager,
+                          ),
+                        ),
+                      );
+                      if (newtask != null) {
+                        // Handle the new task
+                      }
+                    },
+                    shape: const CircleBorder(),
+                    child: const Icon(Icons.add),
+                  ),
+                ),
+              ));
         }
       },
     );
@@ -87,15 +87,24 @@ class _CalendarView extends State<CalendarView> {
     );
   }
 
-  final HeaderStyle _headerStyle = const HeaderStyle(
-      decoration: BoxDecoration(
-    color: Colors.white,
-  ));
-
   Widget _buildCalendarView(Settings settings) {
+    final HeaderStyle headerStyle = HeaderStyle(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+        ),
+        rightIconConfig: IconDataConfig(
+          color: Theme.of(context).colorScheme.onSurface,
+          size: 100,
+        ),
+        leftIconConfig: IconDataConfig(
+          color: Theme.of(context).colorScheme.onSurface,
+          size: 100,
+        ));
+
     switch (_selectedViewIndex) {
       case 0:
         return DayView(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
             onDateTap: (date) async {
@@ -127,9 +136,10 @@ class _CalendarView extends State<CalendarView> {
                 }
               }
             },
-            headerStyle: _headerStyle);
+            headerStyle: headerStyle);
       case 1:
         return WeekView(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
             onDateTap: (date) async {
@@ -161,7 +171,9 @@ class _CalendarView extends State<CalendarView> {
                 }
               }
             },
-            headerStyle: _headerStyle);
+
+            // This Code-Snippet can
+            headerStyle: headerStyle);
       case 2:
         return MonthView(
             onCellTap: (date, events) async {
@@ -190,7 +202,7 @@ class _CalendarView extends State<CalendarView> {
                 _showTaskInfoSheet(context, task);
               }
             },
-            headerStyle: _headerStyle);
+            headerStyle: headerStyle);
       default:
         return Container();
     }
@@ -211,7 +223,7 @@ class _CalendarView extends State<CalendarView> {
         startTime: task.startTime!,
         endTime: task.endTime!,
         color: (task.isCompleted
-            ? AppColors.done
+            ? const Color.fromARGB(255, 126, 154, 160)
             : (isTaskLate(task)
                 ? AppColors.late.value
                 : (isTaskInProgress(task)
@@ -220,12 +232,12 @@ class _CalendarView extends State<CalendarView> {
         titleStyle: TextStyle(
             fontSize: 15,
             color: (task.isCompleted
-                ? Colors.white
+                ? AppColors.onDone
                 : (isTaskLate(task)
                     ? AppColors.late.light.onColor
                     : (isTaskInProgress(task)
                         ? AppColors.inProgress.light.onColor
-                        : Colors.white)))),
+                        : AppColors.onNotStarted)))),
         descriptionStyle: const TextStyle(fontSize: 13),
       );
       task.eventData = eventData; // Store the event data in the task

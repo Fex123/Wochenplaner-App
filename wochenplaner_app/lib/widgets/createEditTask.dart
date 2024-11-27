@@ -64,8 +64,8 @@ class _CreateedittaskState extends State<Createedittask> {
   void saveTask() {
     if (taskNameController.text.isEmpty) {
       setState(() {
-        errorText = const Text('Task name is empty',
-            style: TextStyle(color: Colors.red));
+        errorText = Text('Task name is empty',
+            style: TextStyle(color: Theme.of(context).colorScheme.onError));
       });
       return;
     }
@@ -77,8 +77,8 @@ class _CreateedittaskState extends State<Createedittask> {
           : DateFormat('yyyy-MM-dd').parseStrict(selectedDateController.text);
     } catch (e) {
       setState(() {
-        errorText = const Text('Invalid date format. Use yyyy-MM-dd',
-            style: TextStyle(color: Colors.red));
+        errorText = Text('Invalid date format. Use yyyy-MM-dd',
+            style: TextStyle(color: Theme.of(context).colorScheme.onError));
       });
       return;
     }
@@ -88,8 +88,8 @@ class _CreateedittaskState extends State<Createedittask> {
       DateTime today = DateTime(now.year, now.month, now.day);
       if (selDate.isBefore(today)) {
         setState(() {
-          errorText = const Text('Selected date is before current date',
-              style: TextStyle(color: Colors.red));
+          errorText = Text('Selected date is before current date',
+              style: TextStyle(color: Theme.of(context).colorScheme.onError));
         });
         return;
       }
@@ -107,9 +107,8 @@ class _CreateedittaskState extends State<Createedittask> {
             : DateFormat('HH:mm').parseStrict(startTimeController.text);
       } catch (e) {
         setState(() {
-          errorText = const Text(
-              'Invalid start time format. Use hh:mm a or HH:mm',
-              style: TextStyle(color: Colors.red));
+          errorText = Text('Invalid start time format. Use hh:mm a or HH:mm',
+              style: TextStyle(color: Theme.of(context).colorScheme.onError));
         });
         return;
       }
@@ -127,9 +126,8 @@ class _CreateedittaskState extends State<Createedittask> {
             : DateFormat('HH:mm').parseStrict(endTimeController.text);
       } catch (e) {
         setState(() {
-          errorText = const Text(
-              'Invalid end time format. Use hh:mm a or HH:mm',
-              style: TextStyle(color: Colors.red));
+          errorText = Text('Invalid end time format. Use hh:mm a or HH:mm',
+              style: TextStyle(color: Theme.of(context).colorScheme.onError));
         });
         return;
       }
@@ -147,8 +145,8 @@ class _CreateedittaskState extends State<Createedittask> {
             (endTime.hour == 0 && endTime.minute > 0))) {
       if (endTime.hour != 0 && endTime.minute != 0) {
         setState(() {
-          errorText = const Text('Start is after or equal to end',
-              style: TextStyle(color: Colors.red));
+          errorText = Text('Start is after or equal to end',
+              style: TextStyle(color: Theme.of(context).colorScheme.onError));
         });
         return;
       }
@@ -223,72 +221,81 @@ class _CreateedittaskState extends State<Createedittask> {
       ),
       body: SingleChildScrollView(
         child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TaskTextField(
-                  labelText: "Enter task name",
-                  widthMultiplyer: 2,
-                  controller: taskNameController,
-                  maxInputLength: 20,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TaskTextField(
-                  labelText: "Enter task description",
-                  widthMultiplyer: 2,
-                  controller: taskDescriptionController,
-                  maxInputLength: 120,
-                  lines: 5,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SelectDate(
-                  controller: selectedDateController,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SelectTime(
-                  startTimeController: startTimeController,
-                  endTimeController: endTimeController,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: 125 * 2,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: _image == null
-                        ? const Center(child: Text('Tap to add an image'))
-                        : Image.file(_image!, fit: BoxFit.cover),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50.0), // Add top margin
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TaskTextField(
+                    labelText: "Enter task name",
+                    widthMultiplyer: 2,
+                    controller: taskNameController,
+                    maxInputLength: 20,
                   ),
                 ),
-              ),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CancelButton(
-                      onPressed: () {
-                        Navigator.pop(context, null);
-                      },
-                    ),
-                    const SizedBox(width: 16), // Abstand zwischen den Buttons
-                    SaveButton(saveTask: saveTask),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TaskTextField(
+                    labelText: "Enter task description",
+                    widthMultiplyer: 2,
+                    controller: taskDescriptionController,
+                    maxInputLength: 120,
+                    lines: 5,
+                  ),
                 ),
-              ),
-              errorText,
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SelectDate(
+                    controller: selectedDateController,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SelectTime(
+                    startTimeController: startTimeController,
+                    endTimeController: endTimeController,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: 125 * 2,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 3,
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer),
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius:
+                            BorderRadius.circular(12.0), // Rounded corners
+                      ),
+                      child: _image == null
+                          ? const Center(child: Text('Tap to add an image'))
+                          : Image.file(_image!, fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CancelButton(
+                        onPressed: () {
+                          Navigator.pop(context, null);
+                        },
+                      ),
+                      const SizedBox(width: 16), // Abstand zwischen den Buttons
+                      SaveButton(saveTask: saveTask),
+                    ],
+                  ),
+                ),
+                errorText,
+              ],
+            ),
           ),
         ),
       ),
@@ -316,13 +323,48 @@ class TaskTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double borderRadius = 20.0;
     return SizedBox(
       width: 125 * (widthMultiplyer ?? 1),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.primaryContainer,
+          // Background color
+          border: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(borderRadius), // Rounded corners
+
+            borderSide: const BorderSide(
+              color: Color.fromARGB(0, 33, 149, 243), // Border color
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(borderRadius), // Rounded corners
+
+            borderSide: const BorderSide(
+              color:
+                  Color.fromARGB(0, 33, 149, 243), // Border color when enabled
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(borderRadius), // Rounded corners
+
+            borderSide: BorderSide(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onPrimaryContainer, // Border color when focused
+            ),
+          ),
           labelText: labelText,
+          labelStyle: TextStyle(
+            color: Theme.of(context)
+                .colorScheme
+                .onPrimaryContainer, // Label text color
+          ),
         ),
         maxLength: maxInputLength,
         maxLines: lines,
@@ -456,6 +498,7 @@ class _SelectTimeState extends State<SelectTime> {
               ),
             ],
           ),
+          const SizedBox(width: 5),
           Stack(
             children: <Widget>[
               TaskTextField(
