@@ -57,9 +57,6 @@ class _CalendarView extends State<CalendarView> {
                       ),
                     ),
                   );
-                  if (newtask != null) {
-                    // Handle the new task
-                  }
                 },
                 shape: const CircleBorder(),
                 child: const Icon(Icons.add),
@@ -101,6 +98,27 @@ class _CalendarView extends State<CalendarView> {
         return DayView(
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
+            onDateTap: (date) async {
+              Task? newTask = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Createedittask(
+                    taskManager: widget.taskManager,
+                    taskToEdit: Task(
+                      id: widget.taskManager.getCountTasks().toString(),
+                      title: '',
+                      taskDate: date,
+                      startTime: date,
+                    ),
+                  ),
+                ),
+              );
+              if (newTask != null) {
+                setState(() {
+                  widget.taskManager.addTask(newTask);
+                });
+              }
+            },
             onEventTap: (events, date) async {
               if (events.isNotEmpty) {
                 Task? task = await _getTaskFromEvent(events.first);
@@ -114,6 +132,27 @@ class _CalendarView extends State<CalendarView> {
         return WeekView(
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
+            onDateTap: (date) async {
+              Task? newTask = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Createedittask(
+                    taskManager: widget.taskManager,
+                    taskToEdit: Task(
+                      id: widget.taskManager.getCountTasks().toString(),
+                      title: '',
+                      taskDate: date,
+                      startTime: date,
+                    ),
+                  ),
+                ),
+              );
+              if (newTask != null) {
+                setState(() {
+                  widget.taskManager.addTask(newTask);
+                });
+              }
+            },
             onEventTap: (events, date) async {
               if (events.isNotEmpty) {
                 Task? task = await _getTaskFromEvent(events.first);
@@ -125,6 +164,26 @@ class _CalendarView extends State<CalendarView> {
             headerStyle: _headerStyle);
       case 2:
         return MonthView(
+            onCellTap: (date, events) async {
+              Task? newTask = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Createedittask(
+                    taskManager: widget.taskManager,
+                    taskToEdit: Task(
+                      id: widget.taskManager.getCountTasks().toString(),
+                      title: '',
+                      taskDate: events,
+                    ),
+                  ),
+                ),
+              );
+              if (newTask != null) {
+                setState(() {
+                  widget.taskManager.addTask(newTask);
+                });
+              }
+            },
             onEventTap: (events, date) async {
               Task? task = await _getTaskFromEvent(events);
               if (task != null) {
