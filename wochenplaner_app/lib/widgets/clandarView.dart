@@ -31,7 +31,8 @@ class _CalendarView extends State<CalendarView> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading events'));
         } else {
-          return CalendarControllerProvider(
+          return Scaffold(
+              body: CalendarControllerProvider(
             controller: EventController()..addAll(snapshot.data!),
             child: Scaffold(
               appBar: AppBar(
@@ -64,7 +65,7 @@ class _CalendarView extends State<CalendarView> {
                 child: const Icon(Icons.add),
               ),
             ),
-          );
+          ));
         }
       },
     );
