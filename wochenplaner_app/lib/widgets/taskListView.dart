@@ -279,7 +279,7 @@ class _TaskCardState extends State<TaskCard> {
                               ? TextDecoration.lineThrough
                               : TextDecoration.none,
                           decorationColor:
-                              isChecked ? Colors.white : Colors.transparent,
+                              isChecked ? AppColors.onDone : Colors.transparent,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -316,7 +316,7 @@ class _TaskCardState extends State<TaskCard> {
               Card(
                 color: Theme.of(context)
                     .colorScheme
-                    .primaryContainer, // TODO: Replace with Theme Color for Container
+                    .secondaryContainer, // TODO: Replace with Theme Color for Container
                 margin: const EdgeInsets.only(
                     top: 0, bottom: 10), // Zero margin only at the top
                 shape: const RoundedRectangleBorder(
@@ -334,7 +334,7 @@ class _TaskCardState extends State<TaskCard> {
                       fontSize: 16,
                       color: Theme.of(context)
                           .colorScheme
-                          .onPrimaryContainer, //TODO: Replace with Theme Color for OnContainer
+                          .onSecondaryContainer, //TODO: Replace with Theme Color for OnContainer
                     ),
                     textAlign: TextAlign.center,
                   ),
