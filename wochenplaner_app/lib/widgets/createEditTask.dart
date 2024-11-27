@@ -4,6 +4,7 @@ import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'dart:io'; // Add this import
 import 'package:image_picker/image_picker.dart'; // Add this import
+import 'package:wochenplaner_app/notification.dart'; // Add this import
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
@@ -173,6 +174,14 @@ class _CreateedittaskState extends State<Createedittask> {
         imagePath: _image?.path, // Add this line
       );
     }
+
+    /*if (startTime != null) {
+      ScheduleNotification(
+        title: newTask.title,
+        message: "Task starts in 15min.",
+        taskStartTime: startTime,
+      ).schedulePushNotification();
+    }*/
 
     Navigator.pop(context, newTask);
   }
