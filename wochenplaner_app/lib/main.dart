@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/data/userManagement.dart';
-import 'package:wochenplaner_app/notification.dart';
 import 'package:wochenplaner_app/widgets/clandarView.dart';
 import 'package:wochenplaner_app/widgets/settingsView.dart';
 import 'package:wochenplaner_app/widgets/taskListView.dart';
@@ -17,7 +16,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseNotification().initbaseMessage();
   Settings settings = Settings();
   User? user = FirebaseAuth.instance.currentUser;
   if(user != null) {

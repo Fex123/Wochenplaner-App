@@ -24,7 +24,7 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: StaticComponents.staticAppBar('Settings', context),
+      appBar: StaticComponents.staticAppBar('Login', context),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
