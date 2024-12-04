@@ -235,6 +235,13 @@ class _CreateedittaskState extends State<Createedittask> {
     }
   }
 
+  void _clearImage() {
+    setState(() {
+      _imageBase64 = null;
+      _imageBytes = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -297,7 +304,29 @@ class _CreateedittaskState extends State<Createedittask> {
                       ),
                       child: _imageBytes == null
                           ? const Center(child: Text('Tap to add an image'))
-                          : Image.memory(_imageBytes!, fit: BoxFit.cover),
+                          : Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.memory(_imageBytes!, fit: BoxFit.cover),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: _clearImage,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ),

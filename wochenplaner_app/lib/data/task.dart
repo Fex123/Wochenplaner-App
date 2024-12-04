@@ -1,7 +1,6 @@
 import 'package:calendar_view/calendar_view.dart';
 
 class Task {
-  //obvious attributes
 
   String title;
   String? description = '';

@@ -110,6 +110,7 @@ class _CalendarView extends State<CalendarView> {
             backgroundColor: Theme.of(context).colorScheme.surface,
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
+            showHalfHours:  settings.selectedHalfHourLines,
             onDateTap: (date) async {
               Task? newTask = await Navigator.push(
                 context,
@@ -146,6 +147,7 @@ class _CalendarView extends State<CalendarView> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           startHour: settings.getStartHour(),
           endHour: settings.getEndHour(),
+          showHalfHours: settings.selectedHalfHourLines,
           onDateTap: (date) async {
             Task? newTask = await Navigator.push(
               context,
@@ -179,7 +181,7 @@ class _CalendarView extends State<CalendarView> {
           // This Code-Snippet can
           headerStyle: headerStyle,
           headerStringBuilder: (date, {secondaryDate}) {
-            return '${DateFormat('dd.MM').format(date)}     -     ${DateFormat('dd.MM').format(secondaryDate!)}';
+            return '${DateFormat('dd.MM.yyyy').format(date)}     -     ${DateFormat('dd.MM.yyyy').format(secondaryDate!)}';
           },
         );
       case 2:
@@ -216,8 +218,7 @@ class _CalendarView extends State<CalendarView> {
     }
   }
 
-  Future<List<CalendarEventData>> _convertTasksToEvents(
-      TaskManager taskManager) async {
+  Future<List<CalendarEventData>> _convertTasksToEvents(TaskManager taskManager) async {
     final tasks = await taskManager.getTasks();
     return tasks.where((task) {
       return task.taskDate != null &&
@@ -227,7 +228,7 @@ class _CalendarView extends State<CalendarView> {
       final eventData = CalendarEventData(
         date: task.taskDate!,
         title: task.title,
-        description: task.description,
+        description: "${task.description ?? ''}\n[ID:${task.id}]", // Add ID to description
         startTime: task.startTime!,
         endTime: task.endTime!,
         color: (task.isCompleted
@@ -255,15 +256,16 @@ class _CalendarView extends State<CalendarView> {
 
   Future<Task?> _getTaskFromEvent(CalendarEventData event) async {
     final tasks = await widget.taskManager.getTasks();
-    for (var task in tasks) {
-      if (task.taskDate == event.date &&
-          task.startTime == event.startTime &&
-          task.endTime == event.endTime &&
-          task.title == event.title) {
-        return task;
+    final idMatch = RegExp(r'\[ID:(.*?)\]').firstMatch(event.description ?? '');
+    if (idMatch != null) {
+      final taskId = idMatch.group(1);
+      for (var task in tasks) {
+        if (task.id == taskId) {
+          return task;
+        }
       }
     }
-    return null; // Return null if the task is not found
+    return null;
   }
 
   bool isTaskLate(Task task) {

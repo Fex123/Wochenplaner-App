@@ -1,16 +1,14 @@
-# wochenplaner_app
+## Umgesetzte Nice-to-Have Funktionen
 
-A new Flutter project.
+Die folgenden zusätzlichen Funktionen wurden erfolgreich implementiert:
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Authentifizierungssystem mit Passwort-Reset und automatischer Anmeldung
+- Dark Mode Integrierung
+- Kalenderanpassung (konfigurierbare Stundenanzeige)
+- Individuelles App-Icon und Name
+- Farbliche Kennzeichnung der Aufgaben in Listen- und Kalenderansicht (unterschiedliche Farben für anstehende, laufende und vergangene Aufgaben)
+- Suchfunktion in der Listenansicht
+- Direkte Aufgabenerstellung durch Klick auf Zeitfenster im Kalender
+- Bestätigungsdialoge beim Löschen
+- Filterungssystem für die Aufgabenliste
+- Option zum Ein-/Ausblenden der Halbstundenlinien im Kalender

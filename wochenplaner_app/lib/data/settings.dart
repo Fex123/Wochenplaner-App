@@ -3,7 +3,14 @@ class Settings {
   int endHour = 24;
   bool _isDarkMode = false;
   bool autoLogin = false;
+  bool selectedHalfHourLines = false;
   
+  void setSelectedHalfHourLines(bool halfHourLines) {
+    selectedHalfHourLines = halfHourLines;
+  }
+  bool getSelectedHalfHourLines() {
+    return selectedHalfHourLines;
+  }
   void setAutoLogin(bool value) {
     autoLogin = value;
   }

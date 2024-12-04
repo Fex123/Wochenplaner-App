@@ -14,7 +14,7 @@ class SettingsView extends StatefulWidget {
       {super.key,
       required this.toggleThemeMode,
       required this.settings,
-      required this.taskManager});
+      required this.taskManager,});
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -23,12 +23,14 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView> {
   late double startHour;
   late double endHour;
+  late bool selectedHalfHourLines;
 
   @override
   void initState() {
     super.initState();
     startHour = widget.settings.getStartHour().toDouble();
     endHour = widget.settings.getEndHour().toDouble();
+    selectedHalfHourLines = widget.settings.getSelectedHalfHourLines();
   }
 
   void updateStartHour(double value) {
@@ -48,6 +50,13 @@ class _SettingsViewState extends State<SettingsView> {
       startHour = widget.settings
           .getStartHour()
           .toDouble(); // Update startHour based on settings
+    });
+  }
+
+  void toggleHalfHourLines() {
+    setState(() {
+      selectedHalfHourLines = !selectedHalfHourLines;
+      widget.settings.setSelectedHalfHourLines(selectedHalfHourLines);
     });
   }
 
@@ -90,6 +99,20 @@ class _SettingsViewState extends State<SettingsView> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                CustomSwitch(
+                  toggleState: toggleHalfHourLines,
+                  description: "Show half Hour Lines",
+                  settings: widget.settings,
+                  getValue: () => widget.settings.getSelectedHalfHourLines(),
+                  setValue: (bool value) => widget.settings.setSelectedHalfHourLines(value),
+                ),
+              ],
+            ),
+          ),        
           ElevatedButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
@@ -133,12 +156,16 @@ class CustomSwitch extends StatefulWidget {
   final VoidCallback toggleState;
   final String description;
   final Settings settings;
+  final bool Function()? getValue;
+  final Function(bool)? setValue;
 
   const CustomSwitch({
     super.key,
     required this.toggleState,
     required this.description,
     required this.settings,
+    this.getValue,
+    this.setValue,
   });
 
   @override
@@ -155,11 +182,15 @@ class _CustomSwitchState extends State<CustomSwitch> {
         Switch(
           onChanged: (bool value) {
             setState(() {
-              widget.settings.setDarkMode(value);
+              if (widget.setValue != null && widget.getValue != null) {
+                widget.setValue!(value);
+              } else {
+                widget.settings.setDarkMode(value);
+              }
               widget.toggleState();
             });
           },
-          value: widget.settings.isDarkMode(),
+          value: widget.getValue?.call() ?? widget.settings.isDarkMode(),
         ),
       ],
     );
@@ -217,6 +248,50 @@ class _CustomSliderState extends State<CustomSlider> {
           ],
         ),
       ],
+    );
+  }
+}
+class CustomRadioButton extends StatefulWidget {
+  final int value;
+  final int groupValue;
+  final ValueChanged<int> onChanged;
+  final String description;
+
+  const CustomRadioButton(
+      {super.key,
+      required this.value,
+      required this.groupValue,
+      required this.onChanged,
+      required this.description});
+
+  @override
+  State<CustomRadioButton> createState() => _CustomRadioButtonState();
+}
+
+class _CustomRadioButtonState extends State<CustomRadioButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio(
+            value: widget.value,
+            groupValue: widget.groupValue,
+            onChanged: (int? value) {
+              setState(() {
+                widget.onChanged(widget.value);
+              });
+            },
+          ),
+          Text(
+            widget.description,
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
