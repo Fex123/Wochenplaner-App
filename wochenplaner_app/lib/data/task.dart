@@ -71,7 +71,7 @@ class Task {
       taskDate: taskDate ?? this.taskDate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
-      image: image ?? this.image,
+      image: image,
     )..isCompleted = isCompleted ?? this.isCompleted;
   }
 

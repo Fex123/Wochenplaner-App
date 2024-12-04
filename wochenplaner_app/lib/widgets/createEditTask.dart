@@ -169,6 +169,7 @@ class _CreateedittaskState extends State<Createedittask> {
         endTime: endTime,
         image: _imageBase64,
       );
+      await widget.taskManager.updateTask(newTask);
     } else {
       newTask = Task(
         id: widget.taskManager.getCountTasks().toString(),

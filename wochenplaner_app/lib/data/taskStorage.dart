@@ -60,10 +60,14 @@ class TaskManager {
   }
 
   Future<void> updateTask(Task task) async {
-    tasks[tasks.indexWhere((element) => element.id == task.id)] = task;
+    int taskIndex = tasks.indexWhere((element) => element.id == task.id);
+    if (taskIndex == -1) {
+      print('Task not found with id: ${task.id}');
+      return;
+    }
+    
+    tasks[taskIndex] = task;
     try {
-      final taskMap = task.toMap();
-      print('Task to be updated: $taskMap');
       await _firestore.collection('task').doc(userID).set({
         'tasks': tasks.map((task) => task.toMap()).toList(),
       });
