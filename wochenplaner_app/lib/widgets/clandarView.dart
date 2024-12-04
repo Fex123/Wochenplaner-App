@@ -33,7 +33,7 @@ class _CalendarView extends State<CalendarView> {
           return Center(child: Text('Error loading events'));
         } else {
           return Scaffold(
-              appBar: StaticComponents.staticAppBar('Calendar', context),
+              appBar: StaticComponents.staticAppBar('calendar', context),
               body: CalendarControllerProvider(
                 controller: EventController()..addAll(snapshot.data!),
                 child: Scaffold(

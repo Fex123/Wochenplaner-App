@@ -89,10 +89,6 @@ class _tasklistview extends State<Tasklistview> {
     }
   }
 
-  void _refreshTaskList() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,8 +101,7 @@ class _tasklistview extends State<Tasklistview> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate:
-                    TaskSearchDelegate(widget.taskManager, _refreshTaskList),
+                delegate: TaskSearchDelegate(widget.taskManager),
               );
             },
           ),
@@ -467,9 +462,8 @@ class _TaskCardState extends State<TaskCard> {
 
 class TaskSearchDelegate extends SearchDelegate {
   final TaskManager taskManager;
-  final VoidCallback onSearchClosed;
 
-  TaskSearchDelegate(this.taskManager, this.onSearchClosed);
+  TaskSearchDelegate(this.taskManager);
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -488,8 +482,8 @@ class TaskSearchDelegate extends SearchDelegate {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
+        //TODO: Update tasklist to reflect changes made in search
         close(context, null);
-        onSearchClosed();
       },
     );
   }

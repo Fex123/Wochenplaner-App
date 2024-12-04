@@ -167,11 +167,7 @@ class _CreateedittaskState extends State<Createedittask> {
         taskDate: selDate,
         startTime: startTime,
         endTime: endTime,
-<<<<<<< Updated upstream
-        imagePath: _image?.path, // Add this line
-=======
         image: _imageBase64,
->>>>>>> Stashed changes
       );
     } else {
       newTask = Task(
@@ -222,7 +218,8 @@ class _CreateedittaskState extends State<Createedittask> {
         final bytes = await File(pickedFile.path).readAsBytes();
         final image = img.decodeImage(bytes);
         if (image != null) {
-          final resizedImage = img.copyResize(image, width: 800); // Resize the image to a width of 800 pixels
+          final resizedImage = img.copyResize(image,
+              width: 800); // Resize the image to a width of 800 pixels
           final resizedBytes = img.encodeJpg(resizedImage);
           setState(() {
             _imageBase64 = base64Encode(resizedBytes);
