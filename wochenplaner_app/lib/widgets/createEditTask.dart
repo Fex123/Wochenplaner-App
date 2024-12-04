@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
+import 'package:image/image.dart' as img;
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
@@ -24,7 +28,8 @@ class _CreateedittaskState extends State<Createedittask> {
   final TextEditingController endTimeController = TextEditingController();
 
   Text errorText = const Text('');
-  File? _image; // Add this line
+  String? _imageBase64; // Change to store base64 string
+  Uint8List? _imageBytes;
 
   @override
   void initState() {
@@ -36,8 +41,9 @@ class _CreateedittaskState extends State<Createedittask> {
         selectedDateController.text =
             DateFormat('yyyy-MM-dd').format(widget.taskToEdit!.taskDate!);
       }
-      if (widget.taskToEdit!.imagePath != null) {
-        _image = File(widget.taskToEdit!.imagePath!);
+      if (widget.taskToEdit!.image != null) {
+        _imageBase64 = widget.taskToEdit!.image;
+        _imageBytes = base64Decode(_imageBase64!);
       }
     }
   }
@@ -62,11 +68,11 @@ class _CreateedittaskState extends State<Createedittask> {
     return format.format(time);
   }
 
-  void saveTask() {
+  void saveTask() async {
     if (taskNameController.text.isEmpty) {
       setState(() {
         errorText = Text('Task name is empty',
-            style: TextStyle(color: Theme.of(context).colorScheme.onError));
+            style: TextStyle(color: Theme.of(context).colorScheme.error));
       });
       return;
     }
@@ -79,7 +85,7 @@ class _CreateedittaskState extends State<Createedittask> {
     } catch (e) {
       setState(() {
         errorText = Text('Invalid date format. Use yyyy-MM-dd',
-            style: TextStyle(color: Theme.of(context).colorScheme.onError));
+            style: TextStyle(color: Theme.of(context).colorScheme.error));
       });
       return;
     }
@@ -90,7 +96,7 @@ class _CreateedittaskState extends State<Createedittask> {
       if (selDate.isBefore(today)) {
         setState(() {
           errorText = Text('Selected date is before current date',
-              style: TextStyle(color: Theme.of(context).colorScheme.onError));
+              style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
       }
@@ -109,7 +115,7 @@ class _CreateedittaskState extends State<Createedittask> {
       } catch (e) {
         setState(() {
           errorText = Text('Invalid start time format. Use hh:mm a or HH:mm',
-              style: TextStyle(color: Theme.of(context).colorScheme.onError));
+              style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
       }
@@ -128,7 +134,7 @@ class _CreateedittaskState extends State<Createedittask> {
       } catch (e) {
         setState(() {
           errorText = Text('Invalid end time format. Use hh:mm a or HH:mm',
-              style: TextStyle(color: Theme.of(context).colorScheme.onError));
+              style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
       }
@@ -147,7 +153,7 @@ class _CreateedittaskState extends State<Createedittask> {
       if (endTime.hour != 0 && endTime.minute != 0) {
         setState(() {
           errorText = Text('Start is after or equal to end',
-              style: TextStyle(color: Theme.of(context).colorScheme.onError));
+              style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
       }
@@ -161,7 +167,11 @@ class _CreateedittaskState extends State<Createedittask> {
         taskDate: selDate,
         startTime: startTime,
         endTime: endTime,
+<<<<<<< Updated upstream
         imagePath: _image?.path, // Add this line
+=======
+        image: _imageBase64,
+>>>>>>> Stashed changes
       );
     } else {
       newTask = Task(
@@ -171,7 +181,7 @@ class _CreateedittaskState extends State<Createedittask> {
         taskDate: selDate,
         startTime: startTime,
         endTime: endTime,
-        imagePath: _image?.path, // Add this line
+        image: _imageBase64,
       );
     }
 
@@ -208,9 +218,23 @@ class _CreateedittaskState extends State<Createedittask> {
     );
 
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      try {
+        final bytes = await File(pickedFile.path).readAsBytes();
+        final image = img.decodeImage(bytes);
+        if (image != null) {
+          final resizedImage = img.copyResize(image, width: 800); // Resize the image to a width of 800 pixels
+          final resizedBytes = img.encodeJpg(resizedImage);
+          setState(() {
+            _imageBase64 = base64Encode(resizedBytes);
+            _imageBytes = resizedBytes;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          errorText = Text('Failed to pick image: $e',
+              style: TextStyle(color: Theme.of(context).colorScheme.error));
+        });
+      }
     }
   }
 
@@ -274,9 +298,9 @@ class _CreateedittaskState extends State<Createedittask> {
                         borderRadius:
                             BorderRadius.circular(12.0), // Rounded corners
                       ),
-                      child: _image == null
+                      child: _imageBytes == null
                           ? const Center(child: Text('Tap to add an image'))
-                          : Image.file(_image!, fit: BoxFit.cover),
+                          : Image.memory(_imageBytes!, fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -294,7 +318,7 @@ class _CreateedittaskState extends State<Createedittask> {
                     ],
                   ),
                 ),
-                errorText,
+                Padding(padding: const EdgeInsets.all(8.0), child: errorText),
               ],
             ),
           ),

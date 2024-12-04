@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart'; // Ensure this import is correct
+import 'dart:convert';
 
 class TaskInfoSheet extends StatelessWidget {
   final Task task;
@@ -82,7 +83,7 @@ class TaskInfoSheet extends StatelessWidget {
                   ),
                   const Divider(), // Divider under the time
                 ],
-                if (task.imagePath != null) ...[
+                if (task.image != null) ...[
                   const Divider(), // Trennlinie
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -96,8 +97,8 @@ class TaskInfoSheet extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
-                          child: Image.file(
-                            File(task.imagePath!),
+                          child: Image.memory(
+                            base64Decode(task.image!),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -133,10 +134,12 @@ class TaskInfoSheet extends StatelessWidget {
                       const SizedBox(width: 16), // Abstand zwischen den Buttons
                       IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          taskManager.removeTask(task);
+                        onPressed: () async {
+                          bool confirm = await taskManager.removeTask(context, task);
+                          if(confirm) {
                           Navigator.pop(context); // Schließt das Bottom Sheet
                           onTaskRemoved(); // Aktualisiert die Ansicht
+                          }
                         },
                       ),
                     ],

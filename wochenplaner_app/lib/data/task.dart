@@ -8,12 +8,8 @@ class Task {
   DateTime? taskDate;
   DateTime? startTime;
   DateTime? endTime;
-  String? imagePath;
+  String? image;
   CalendarEventData? eventData;
-
-  //To-Do: Add options for pictures and memory
-
-  //internal attributes
 
   late String id;
   bool isCompleted = false;
@@ -25,7 +21,7 @@ class Task {
     this.taskDate,
     this.startTime,
     this.endTime,
-    this.imagePath, // Add this line
+    this.image,
   });
 
   void changeTaskState() {
@@ -66,7 +62,7 @@ class Task {
     DateTime? taskDate,
     DateTime? startTime,
     DateTime? endTime,
-    String? imagePath, // Add this line
+    String? image,
     bool? isCompleted,
   }) {
     return Task(
@@ -76,7 +72,7 @@ class Task {
       taskDate: taskDate ?? this.taskDate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
-      imagePath: imagePath ?? this.imagePath, // Add this line
+      image: image ?? this.image,
     )..isCompleted = isCompleted ?? this.isCompleted;
   }
 
@@ -88,7 +84,7 @@ class Task {
       'taskDate': taskDate?.toIso8601String(),
       'startTime': startTime?.toIso8601String(),
       'endTime': endTime?.toIso8601String(),
-      'imagePath': imagePath,
+      'image': image,
       'isCompleted': isCompleted,
     };
   }
@@ -101,7 +97,7 @@ class Task {
       taskDate: map['taskDate'] != null ? DateTime.parse(map['taskDate']) : null,
       startTime: map['startTime'] != null ? DateTime.parse(map['startTime']) : null,
       endTime: map['endTime'] != null ? DateTime.parse(map['endTime']) : null,
-      imagePath: map['imagePath'],
+      image: map['image'],
     )..isCompleted = map['isCompleted'] ?? false;
   }
 }
