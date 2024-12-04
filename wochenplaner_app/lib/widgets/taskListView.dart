@@ -17,6 +17,81 @@ class Tasklistview extends StatefulWidget {
 
 class _tasklistview extends State<Tasklistview> {
   String searchQuery = '';
+  String filter = '';
+
+  void _showFilterMenu() async {
+    final selectedFilter = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(100, 100, 0, 0),
+      items: [
+        PopupMenuItem<String>(
+          value: 'no_filter',
+          child: Text(
+            'No filters',
+            style: TextStyle(
+              color: filter == 'no_filter'
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'late',
+          child: Text(
+            'Only late events',
+            style: TextStyle(
+              color: filter == 'late'
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'unfinished',
+          child: Text(
+            'Only unfinished events',
+            style: TextStyle(
+              color: filter == 'unfinished'
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'finished',
+          child: Text(
+            'Only finished tasks',
+            style: TextStyle(
+              color: filter == 'finished'
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'ongoing',
+          child: Text(
+            'Only ongoing tasks',
+            style: TextStyle(
+              color: filter == 'ongoing'
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (selectedFilter != null) {
+      setState(() {
+        filter = selectedFilter == 'no_filter' ? '' : selectedFilter;
+      });
+    }
+  }
+
+  void _refreshTaskList() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +105,28 @@ class _tasklistview extends State<Tasklistview> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: TaskSearchDelegate(widget.taskManager),
+                delegate:
+                    TaskSearchDelegate(widget.taskManager, _refreshTaskList),
               );
             },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.filter_list,
+              color: filter.isNotEmpty
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+            onPressed: _showFilterMenu,
           ),
         ],
       ),
       body: Center(
-        child: TaskCardList(taskManager: widget.taskManager, searchQuery: searchQuery),
+        child: TaskCardList(
+          taskManager: widget.taskManager,
+          searchQuery: searchQuery,
+          filter: filter,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -63,10 +152,16 @@ class _tasklistview extends State<Tasklistview> {
 }
 
 class TaskCardList extends StatefulWidget {
-  const TaskCardList({super.key, required this.taskManager, required this.searchQuery});
+  const TaskCardList({
+    super.key,
+    required this.taskManager,
+    required this.searchQuery,
+    required this.filter,
+  });
 
   final TaskManager taskManager;
   final String searchQuery;
+  final String filter;
 
   @override
   _TaskCardListState createState() => _TaskCardListState();
@@ -79,6 +174,15 @@ class _TaskCardListState extends State<TaskCardList> {
   void initState() {
     super.initState();
     _loadTasks();
+  }
+
+  @override
+  void didUpdateWidget(TaskCardList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.filter != widget.filter ||
+        oldWidget.searchQuery != widget.searchQuery) {
+      _loadTasks();
+    }
   }
 
   Future<void> _loadTasks() async {
@@ -98,7 +202,18 @@ class _TaskCardListState extends State<TaskCardList> {
   @override
   Widget build(BuildContext context) {
     final filteredTasks = tasks.where((task) {
-      return task.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
+      final matchesSearchQuery =
+          task.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
+      final matchesFilter = widget.filter == 'late'
+          ? isTaskLate(task)
+          : widget.filter == 'unfinished'
+              ? !task.isCompleted
+              : widget.filter == 'finished'
+                  ? task.isCompleted
+                  : widget.filter == 'ongoing'
+                      ? isTaskInProgress(task) && !isTaskLate(task)
+                      : true;
+      return matchesSearchQuery && matchesFilter;
     }).toList();
 
     return filteredTasks.isEmpty
@@ -115,6 +230,55 @@ class _TaskCardListState extends State<TaskCardList> {
             },
           );
   }
+}
+
+bool isTaskLate(Task task) {
+  if (task.taskDate == null || task.endTime == null) return false;
+
+  final now = DateTime.now();
+  final taskEndTime = DateTime(
+    task.taskDate!.year,
+    task.taskDate!.month,
+    task.taskDate!.day,
+    task.endTime!.hour,
+    task.endTime!.minute,
+  );
+
+  if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
+    final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
+    return now.isAfter(taskEndTimeNextDay);
+  }
+
+  return now.isAfter(taskEndTime);
+}
+
+bool isTaskInProgress(Task task) {
+  if (task.taskDate == null || task.startTime == null || task.endTime == null)
+    return false;
+
+  final now = DateTime.now();
+  final taskStartTime = DateTime(
+    task.taskDate!.year,
+    task.taskDate!.month,
+    task.taskDate!.day,
+    task.startTime!.hour,
+    task.startTime!.minute,
+  );
+  var taskEndTime = DateTime(
+    task.taskDate!.year,
+    task.taskDate!.month,
+    task.taskDate!.day,
+    task.endTime!.hour,
+    task.endTime!.minute,
+  );
+
+  if (task.startTime!.hour > task.endTime!.hour ||
+      (task.startTime!.hour == task.endTime!.hour &&
+          task.startTime!.minute > task.endTime!.minute)) {
+    taskEndTime = taskEndTime.add(Duration(days: 1));
+  }
+
+  return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
 }
 
 class TaskCard extends StatefulWidget {
@@ -144,6 +308,16 @@ class _TaskCardState extends State<TaskCard> {
     isChecked = widget.task.isCompleted;
   }
 
+  @override
+  void didUpdateWidget(TaskCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.task.isCompleted != widget.task.isCompleted) {
+      setState(() {
+        isChecked = widget.task.isCompleted;
+      });
+    }
+  }
+
   String formatDate() {
     final dateFormat = DateFormat('yyyy-MM-dd');
     return dateFormat.format(widget.task.taskDate!);
@@ -158,58 +332,6 @@ class _TaskCardState extends State<TaskCard> {
     } else {
       return dateFormat.format(widget.task.endTime!);
     }
-  }
-
-  bool isTaskLate(Task task) {
-    if (task.taskDate == null || task.endTime == null) return false;
-
-    final now = DateTime.now();
-    final taskEndTime = DateTime(
-      task.taskDate!.year,
-      task.taskDate!.month,
-      task.taskDate!.day,
-      task.endTime!.hour,
-      task.endTime!.minute,
-    );
-
-    // Check if the task spans across midnight
-    if (task.startTime != null && task.startTime!.hour > task.endTime!.hour) {
-      // If the current time is before the task end time on the next day
-      final taskEndTimeNextDay = taskEndTime.add(Duration(days: 1));
-      return now.isAfter(taskEndTimeNextDay);
-    }
-
-    return now.isAfter(taskEndTime);
-  }
-
-  bool isTaskInProgress(Task task) {
-    if (task.taskDate == null || task.startTime == null || task.endTime == null)
-      return false;
-
-    final now = DateTime.now();
-    final taskStartTime = DateTime(
-      task.taskDate!.year,
-      task.taskDate!.month,
-      task.taskDate!.day,
-      task.startTime!.hour,
-      task.startTime!.minute,
-    );
-    var taskEndTime = DateTime(
-      task.taskDate!.year,
-      task.taskDate!.month,
-      task.taskDate!.day,
-      task.endTime!.hour,
-      task.endTime!.minute,
-    );
-
-    // Check if the task spans across midnight
-    if (task.startTime!.hour > task.endTime!.hour ||
-        (task.startTime!.hour == task.endTime!.hour &&
-            task.startTime!.minute > task.endTime!.minute)) {
-      taskEndTime = taskEndTime.add(Duration(days: 1));
-    }
-
-    return now.isAfter(taskStartTime) && now.isBefore(taskEndTime);
   }
 
   @override
@@ -314,9 +436,7 @@ class _TaskCardState extends State<TaskCard> {
                 widget.task.startTime != null &&
                 widget.task.endTime != null)
               Card(
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondaryContainer, // TODO: Replace with Theme Color for Container
+                color: Theme.of(context).colorScheme.primaryContainer,
                 margin: const EdgeInsets.only(
                     top: 0, bottom: 10), // Zero margin only at the top
                 shape: const RoundedRectangleBorder(
@@ -332,9 +452,7 @@ class _TaskCardState extends State<TaskCard> {
                     '${DateFormat.yMMMd().format(widget.task.taskDate!)}\n${formatTime(true)} - ${formatTime(false)}',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSecondaryContainer, //TODO: Replace with Theme Color for OnContainer
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -349,8 +467,9 @@ class _TaskCardState extends State<TaskCard> {
 
 class TaskSearchDelegate extends SearchDelegate {
   final TaskManager taskManager;
+  final VoidCallback onSearchClosed;
 
-  TaskSearchDelegate(this.taskManager);
+  TaskSearchDelegate(this.taskManager, this.onSearchClosed);
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -370,17 +489,20 @@ class TaskSearchDelegate extends SearchDelegate {
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
         close(context, null);
+        onSearchClosed();
       },
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    return TaskCardList(taskManager: taskManager, searchQuery: query);
+    return TaskCardList(
+        taskManager: taskManager, searchQuery: query, filter: '');
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return TaskCardList(taskManager: taskManager, searchQuery: query);
+    return TaskCardList(
+        taskManager: taskManager, searchQuery: query, filter: '');
   }
 }

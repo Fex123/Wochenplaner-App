@@ -162,7 +162,8 @@ class _CreateedittaskState extends State<Createedittask> {
         startTime: startTime,
         endTime: endTime,
         imagePath: _image?.path, // Add this line
-      );} else {
+      );
+    } else {
       newTask = Task(
         id: widget.taskManager.getCountTasks().toString(),
         title: taskNameController.text,

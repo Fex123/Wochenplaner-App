@@ -21,9 +21,9 @@ class StaticComponents {
           style: TextStyle(
               fontWeight: FontWeight.w900,
               //fontFamily: 'monosquare'
-              color: Theme.of(context).colorScheme.onPrimaryFixed)),
+              color: Theme.of(context).colorScheme.onPrimaryContainer)),
       automaticallyImplyLeading: false,
-      backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
     );
   }
 }

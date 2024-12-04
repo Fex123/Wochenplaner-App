@@ -56,7 +56,9 @@ class _CalendarView extends State<CalendarView> {
                         ),
                       );
                       if (newtask != null) {
-                        // Handle the new task
+                        setState(() {
+                          widget.taskManager.addTask(newtask);
+                        });
                       }
                     },
                     shape: const CircleBorder(),
@@ -229,7 +231,7 @@ class _CalendarView extends State<CalendarView> {
         startTime: task.startTime!,
         endTime: task.endTime!,
         color: (task.isCompleted
-            ? const Color.fromARGB(255, 126, 154, 160)
+            ? AppColors.done
             : (isTaskLate(task)
                 ? AppColors.late.value
                 : (isTaskInProgress(task)

@@ -18,7 +18,7 @@ void main() async {
   );
   Settings settings = Settings();
   User? user = FirebaseAuth.instance.currentUser;
-  if(user != null) {
+  if (user != null) {
     settings.setAutoLogin(true);
   }
   runApp(MyApp(settings: settings, isLoggedIn: user != null));
@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     : Container(),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).colorScheme.primaryFixed,
+        color: Theme.of(context).colorScheme.primaryContainer,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -123,21 +123,21 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 _onItemTapped(0);
               },
-              color: Theme.of(context).colorScheme.onPrimaryFixed,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
             IconButton(
               icon: const Icon(Icons.calendar_today),
               onPressed: () {
                 _onItemTapped(1);
               },
-              color: Theme.of(context).colorScheme.onPrimaryFixed,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
                 _onItemTapped(2);
               },
-              color: Theme.of(context).colorScheme.onPrimaryFixed,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ],
         ),
