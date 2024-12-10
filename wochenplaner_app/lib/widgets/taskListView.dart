@@ -5,6 +5,7 @@ import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
 import 'package:wochenplaner_app/widgets/taskInfoSheet.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Tasklistview extends StatefulWidget {
   const Tasklistview({super.key, required this.taskManager});
@@ -27,7 +28,7 @@ class _tasklistview extends State<Tasklistview> {
         PopupMenuItem<String>(
           value: 'no_filter',
           child: Text(
-            'No filters',
+            AppLocalizations.of(context)?.no_filters ?? 'No filters',
             style: TextStyle(
               color: filter == 'no_filter'
                   ? Theme.of(context).colorScheme.primary
@@ -38,7 +39,8 @@ class _tasklistview extends State<Tasklistview> {
         PopupMenuItem<String>(
           value: 'late',
           child: Text(
-            'Only late events',
+            AppLocalizations.of(context)?.only_late_events ??
+                'Only late events',
             style: TextStyle(
               color: filter == 'late'
                   ? Theme.of(context).colorScheme.primary
@@ -49,7 +51,8 @@ class _tasklistview extends State<Tasklistview> {
         PopupMenuItem<String>(
           value: 'unfinished',
           child: Text(
-            'Only unfinished events',
+            AppLocalizations.of(context)?.only_unfinished_events ??
+                'Only unfinished events',
             style: TextStyle(
               color: filter == 'unfinished'
                   ? Theme.of(context).colorScheme.primary
@@ -60,7 +63,8 @@ class _tasklistview extends State<Tasklistview> {
         PopupMenuItem<String>(
           value: 'finished',
           child: Text(
-            'Only finished tasks',
+            AppLocalizations.of(context)?.only_finished_tasks ??
+                'Only finished tasks',
             style: TextStyle(
               color: filter == 'finished'
                   ? Theme.of(context).colorScheme.primary
@@ -71,7 +75,8 @@ class _tasklistview extends State<Tasklistview> {
         PopupMenuItem<String>(
           value: 'ongoing',
           child: Text(
-            'Only ongoing tasks',
+            AppLocalizations.of(context)?.only_ongoing_tasks ??
+                'Only ongoing tasks',
             style: TextStyle(
               color: filter == 'ongoing'
                   ? Theme.of(context).colorScheme.primary
@@ -94,7 +99,7 @@ class _tasklistview extends State<Tasklistview> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Tasks'),
+        title: Text(AppLocalizations.of(context)?.tasks ?? 'Tasks'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -212,7 +217,9 @@ class _TaskCardListState extends State<TaskCardList> {
     }).toList();
 
     return filteredTasks.isEmpty
-        ? const Center(child: Text('No tasks available'))
+        ? Center(
+            child: Text(AppLocalizations.of(context)?.no_tasks_available ??
+                'No tasks available'))
         : ListView.builder(
             itemCount: filteredTasks.length,
             itemBuilder: (context, index) {

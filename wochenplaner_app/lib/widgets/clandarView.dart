@@ -8,6 +8,8 @@ import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart';
 import 'package:wochenplaner_app/widgets/taskInfoSheet.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class CalendarView extends StatefulWidget {
   final TaskManager taskManager;
   final Settings settings;
@@ -30,10 +32,14 @@ class _CalendarView extends State<CalendarView> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error loading events'));
+          return Center(
+              child: Text(AppLocalizations.of(context)?.error_loading_events ??
+                  'Error loading events'));
         } else {
           return Scaffold(
-              appBar: StaticComponents.staticAppBar('calendar', context),
+              appBar: StaticComponents.staticAppBar(
+                  AppLocalizations.of(context)?.calendar ?? 'Calendar',
+                  context),
               body: CalendarControllerProvider(
                 controller: EventController()..addAll(snapshot.data!),
                 child: Scaffold(
@@ -75,10 +81,16 @@ class _CalendarView extends State<CalendarView> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SegmentedButton(
-        segments: const [
-          ButtonSegment(value: 0, label: Text('Day')),
-          ButtonSegment(value: 1, label: Text('Week')),
-          ButtonSegment(value: 2, label: Text('Month')),
+        segments: [
+          ButtonSegment(
+              value: 0,
+              label: Text(AppLocalizations.of(context)?.day ?? 'Day')),
+          ButtonSegment(
+              value: 1,
+              label: Text(AppLocalizations.of(context)?.week ?? 'Week')),
+          ButtonSegment(
+              value: 2,
+              label: Text(AppLocalizations.of(context)?.month ?? 'Month')),
         ],
         selected: {_selectedViewIndex},
         onSelectionChanged: (Set<int> newSelection) {
@@ -110,7 +122,7 @@ class _CalendarView extends State<CalendarView> {
             backgroundColor: Theme.of(context).colorScheme.surface,
             startHour: settings.getStartHour(),
             endHour: settings.getEndHour(),
-            showHalfHours:  settings.selectedHalfHourLines,
+            showHalfHours: settings.selectedHalfHourLines,
             onDateTap: (date) async {
               Task? newTask = await Navigator.push(
                 context,
@@ -218,7 +230,8 @@ class _CalendarView extends State<CalendarView> {
     }
   }
 
-  Future<List<CalendarEventData>> _convertTasksToEvents(TaskManager taskManager) async {
+  Future<List<CalendarEventData>> _convertTasksToEvents(
+      TaskManager taskManager) async {
     final tasks = await taskManager.getTasks();
     return tasks.where((task) {
       return task.taskDate != null &&
@@ -228,7 +241,8 @@ class _CalendarView extends State<CalendarView> {
       final eventData = CalendarEventData(
         date: task.taskDate!,
         title: task.title,
-        description: "${task.description ?? ''}\n[ID:${task.id}]", // Add ID to description
+        description:
+            "${task.description ?? ''}\n[ID:${task.id}]", // Add ID to description
         startTime: task.startTime!,
         endTime: task.endTime!,
         color: (task.isCompleted

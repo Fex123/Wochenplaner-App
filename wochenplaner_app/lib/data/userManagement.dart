@@ -4,13 +4,18 @@ import 'package:wochenplaner_app/data/settings.dart' as app_settings;
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/main.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   final app_settings.Settings settings;
   final VoidCallback toggleThemeMode;
+  final void Function(Locale) changeLocale;
 
   const LoginScreen(
-      {super.key, required this.settings, required this.toggleThemeMode});
+      {super.key,
+      required this.settings,
+      required this.toggleThemeMode,
+      required this.changeLocale});
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
@@ -24,7 +29,8 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: StaticComponents.staticAppBar('Login', context),
+      appBar: StaticComponents.staticAppBar(
+          AppLocalizations.of(context)?.login ?? 'Login', context),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -32,14 +38,16 @@ class _LoginScreen extends State<LoginScreen> {
               Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InputBox(
-                    labelText: "Insert Email",
+                    labelText: AppLocalizations.of(context)?.insert_email ??
+                        "Insert Email",
                     controller: _emailController,
                     obscureText: false,
                   )),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InputBox(
-                  labelText: "Insert Password",
+                  labelText: AppLocalizations.of(context)?.insert_password ??
+                      "Insert Password",
                   controller: _passwordController,
                   obscureText: true,
                 ),
@@ -60,7 +68,9 @@ class _LoginScreen extends State<LoginScreen> {
 
                   if (!_isValidEmail(email)) {
                     setState(() {
-                      _errorMessage = 'That\'s not a valid email address.';
+                      _errorMessage =
+                          AppLocalizations.of(context)?.invalid_email_address ??
+                              'That\'s not a valid email address.';
                     });
                     return;
                   }
@@ -69,25 +79,33 @@ class _LoginScreen extends State<LoginScreen> {
                     await FirebaseAuth.instance
                         .sendPasswordResetEmail(email: email);
                     setState(() {
-                      _errorMessage =
+                      _errorMessage = AppLocalizations.of(context)
+                              ?.password_reset_email_sent ??
                           'Password reset email sent. Please check your inbox.';
                     });
                   } on FirebaseAuthException catch (e) {
                     setState(() {
                       if (e.code == 'user-not-found') {
-                        _errorMessage = 'No user found for that email.';
+                        _errorMessage = AppLocalizations.of(context)
+                                ?.no_user_found_for_that_email ??
+                            'No user found for that email.';
                       } else {
-                        _errorMessage = 'An error occurred. Please try again.';
+                        _errorMessage =
+                            AppLocalizations.of(context)?.an_error_occurred ??
+                                'An error occurred. Please try again.';
                       }
                     });
                   } catch (e) {
                     setState(() {
-                      _errorMessage = 'An error occurred. Please try again.';
+                      _errorMessage =
+                          AppLocalizations.of(context)?.an_error_occurred ??
+                              'An error occurred. Please try again.';
                     });
                   }
                 },
                 child: Text(
-                  "Reset Password",
+                  AppLocalizations.of(context)?.reset_password ??
+                      "Reset Password",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     decoration: TextDecoration.underline,
@@ -116,7 +134,8 @@ class _LoginScreen extends State<LoginScreen> {
                             !(credential.user?.emailVerified ?? false)) {
                           await FirebaseAuth.instance.signOut();
                           setState(() {
-                            _errorMessage =
+                            _errorMessage = AppLocalizations.of(context)
+                                    ?.please_verify_your_email ??
                                 'Please verify your email to log in.';
                           });
                           return;
@@ -135,26 +154,32 @@ class _LoginScreen extends State<LoginScreen> {
                               taskManager: taskManager,
                               settings: widget.settings,
                               toggleThemeMode: widget.toggleThemeMode,
+                              changeLocale: widget.changeLocale,
                             ),
                           ),
                         );
                       } on FirebaseAuthException catch (e) {
                         setState(() {
                           if (e.code == 'invalid-credential') {
-                            _errorMessage = 'User or password is incorrect.';
+                            _errorMessage = AppLocalizations.of(context)
+                                    ?.user_or_password_incorrect ??
+                                'User or password is incorrect.';
                           } else {
-                            _errorMessage =
-                                'An error occurred. Please try again.';
+                            _errorMessage = _errorMessage =
+                                AppLocalizations.of(context)
+                                        ?.an_error_occurred ??
+                                    'An error occurred. Please try again.';
                           }
                         });
                       } catch (e) {
                         setState(() {
-                          _errorMessage =
-                              'An error occurred. Please try again.';
+                          _errorMessage = _errorMessage =
+                              AppLocalizations.of(context)?.an_error_occurred ??
+                                  'An error occurred. Please try again.';
                         });
                       }
                     },
-                    child: const Text("Login"),
+                    child: Text(AppLocalizations.of(context)?.login ?? "Login"),
                   )),
               Padding(
                   padding: const EdgeInsets.only(top: 10.0),
@@ -168,7 +193,8 @@ class _LoginScreen extends State<LoginScreen> {
                         ),
                       );
                     },
-                    child: const Text("Register"),
+                    child: Text(
+                        AppLocalizations.of(context)?.register ?? "Register"),
                   ))
             ],
           ),
@@ -201,7 +227,7 @@ class _RegisterScreen extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        title: Text(AppLocalizations.of(context)?.register ?? 'Register'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -210,14 +236,16 @@ class _RegisterScreen extends State<RegisterScreen> {
               Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InputBox(
-                    labelText: "Insert Email",
+                    labelText: AppLocalizations.of(context)?.insert_email ??
+                        "Insert Email",
                     controller: _emailController,
                     obscureText: false,
                   )),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InputBox(
-                  labelText: "Insert Password",
+                  labelText: AppLocalizations.of(context)?.insert_password ??
+                      "Insert Password",
                   controller: _passwordController,
                   obscureText: true,
                 ),
@@ -225,7 +253,8 @@ class _RegisterScreen extends State<RegisterScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InputBox(
-                  labelText: "Confirm Password",
+                  labelText: AppLocalizations.of(context)?.confirm_password ??
+                      "Confirm Password",
                   controller: _confirmPasswordController,
                   obscureText: true,
                 ),
@@ -253,14 +282,18 @@ class _RegisterScreen extends State<RegisterScreen> {
 
                   if (!_isValidEmail(email)) {
                     setState(() {
-                      _errorMessage = 'That\'s not a valid email address.';
+                      _errorMessage =
+                          AppLocalizations.of(context)?.invalid_email_address ??
+                              'That\'s not a valid email address.';
                     });
                     return;
                   }
 
                   if (password != confirmPassword) {
                     setState(() {
-                      _errorMessage = 'Passwords do not match.';
+                      _errorMessage = AppLocalizations.of(context)
+                              ?.passwords_do_not_match ??
+                          'Passwords do not match.';
                     });
                     return;
                   }
@@ -283,21 +316,30 @@ class _RegisterScreen extends State<RegisterScreen> {
                   } on FirebaseAuthException catch (e) {
                     setState(() {
                       if (e.code == 'weak-password') {
-                        _errorMessage = 'The password provided is too weak.';
-                      } else if (e.code == 'email-already-in-use') {
                         _errorMessage =
-                            'The account already exists for that email.';
+                            AppLocalizations.of(context)?.password_too_weak ??
+                                'The password provided is too weak.';
+                      } else if (e.code == 'email-already-in-use') {
+                        _errorMessage = _errorMessage =
+                            AppLocalizations.of(context)
+                                    ?.email_already_in_use ??
+                                'The account already exists for that email.';
                       } else {
-                        _errorMessage = 'An error occurred. Please try again.';
+                        _errorMessage =
+                            AppLocalizations.of(context)?.an_error_occurred ??
+                                'An error occurred. Please try again.';
                       }
                     });
                   } catch (e) {
                     setState(() {
-                      _errorMessage = 'An error occurred. Please try again.';
+                      _errorMessage =
+                          AppLocalizations.of(context)?.an_error_occurred ??
+                              'An error occurred. Please try again.';
                     });
                   }
                 },
-                child: const Text("Register"),
+                child:
+                    Text(AppLocalizations.of(context)?.register ?? "Register"),
               ),
             ],
           ),

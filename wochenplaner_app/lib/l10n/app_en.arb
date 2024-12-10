@@ -1,0 +1,230 @@
+{
+    "calendar": "Calendar",
+    "@calendar": {
+        "description": "String for the word Calendar"
+    },
+    "tasks": "Tasks",
+    "@tasks": {
+        "description": "String for the word Tasks"
+    },
+    "settings": "Settings",
+    "@settings": {
+        "description": "String for the word Settings"
+    },
+    "activate_dark_mode": "Activate dark mode",
+    "@activate_dark_mode": {
+        "description": "String for the dark mode toggle description"
+    },
+    "set_calendar_view_range_from": "Set Calendar view range from:",
+    "@set_calendar_view_range_from": {
+        "description": "String for the calendar view range start description"
+    },
+    "save": "Save",
+    "@save": {
+        "description": "String for the save button"
+    },
+    "cancel": "Cancel",
+    "@cancel": {
+        "description": "String for the cancel button"
+    },
+    "to": "To:",
+    "@to": {
+        "description": "String for the calendar view range end description"
+    },
+    "show_half_hour_lines": "Show half Hour Lines",
+    "@show_half_hour_lines": {
+        "description": "String for the half hour lines toggle description"
+    },
+    "language": "Language",
+    "@language": {
+        "description": "String for the language selection description"
+    },
+    "account_logout": "Account Logout",
+    "@account_logout": {
+        "description": "String for the account logout button"
+    },
+    "delete_account": "Delete Account",
+    "@delete_account": {
+        "description": "String for the delete account button"
+    },
+    "no_filters": "No filters",
+    "@no_filters": {
+        "description": "String for the no filters option"
+    },
+    "only_late_events": "Only late events",
+    "@only_late_events": {
+        "description": "String for the only late events filter option"
+    },
+    "only_unfinished_events": "Only unfinished events",
+    "@only_unfinished_events": {
+        "description": "String for the only unfinished events filter option"
+    },
+    "only_finished_tasks": "Only finished tasks",
+    "@only_finished_tasks": {
+        "description": "String for the only finished tasks filter option"
+    },
+    "only_ongoing_tasks": "Only ongoing tasks",
+    "@only_ongoing_tasks": {
+        "description": "String for the only ongoing tasks filter option"
+    },
+    "no_tasks_available": "No tasks available",
+    "@no_tasks_available": {
+        "description": "String for the no tasks available message"
+    },
+    "date": "Date:",
+    "@date": {
+        "description": "String for the date label"
+    },
+    "time_period": "Time period:",
+    "@time_period": {
+        "description": "String for the time period label"
+    },
+    "edit": "Edit",
+    "@edit": {
+        "description": "String for the edit button"
+    },
+    "error_loading_events": "Error loading events",
+    "@error_loading_events": {
+        "description": "String for the error loading events message"
+    },
+    "day": "Day",
+    "@day": {
+        "description": "String for the day view label"
+    },
+    "week": "Week",
+    "@week": {
+        "description": "String for the week view label"
+    },
+    "month": "Month",
+    "@month": {
+        "description": "String for the month view label"
+    },
+    "task_name_empty": "Task name is empty",
+    "@task_name_empty": {
+        "description": "String for the task name empty error"
+    },
+    "invalid_date_format": "Invalid date format. Use yyyy-MM-dd",
+    "@invalid_date_format": {
+        "description": "String for the invalid date format error"
+    },
+    "selected_date_before_current_date": "Selected date is before current date",
+    "@selected_date_before_current_date": {
+        "description": "String for the selected date before current date error"
+    },
+    "invalid_start_time_format": "Invalid start time format. Use hh:mm a or HH:mm",
+    "@invalid_start_time_format": {
+        "description": "String for the invalid start time format error"
+    },
+    "invalid_end_time_format": "Invalid end time format. Use hh:mm a or HH:mm",
+    "@invalid_end_time_format": {
+        "description": "String for the invalid end time format error"
+    },
+    "start_after_or_equal_to_end": "Start is after or equal to end",
+    "@start_after_or_equal_to_end": {
+        "description": "String for the start after or equal to end error"
+    },
+    "select_image": "Select Image",
+    "@select_image": {
+        "description": "String for the select image dialog title"
+    },
+    "camera": "Camera",
+    "@camera": {
+        "description": "String for the camera option"
+    },
+    "gallery": "Gallery",
+    "@gallery": {
+        "description": "String for the gallery option"
+    },
+    "failed_to_pick_image": "Failed to pick image:",
+    "@failed_to_pick_image": {
+        "description": "String for the failed to pick image error"
+    },
+    "create_edit_task": "Create/Edit Task",
+    "@create_edit_task": {
+        "description": "String for the create/edit task screen title"
+    },
+    "enter_task_name": "Enter task name",
+    "@enter_task_name": {
+        "description": "String for the enter task name label"
+    },
+    "enter_task_description": "Enter task description",
+    "@enter_task_description": {
+        "description": "String for the enter task description label"
+    },
+    "tap_to_add_image": "Tap to add an image",
+    "@tap_to_add_image": {
+        "description": "String for the tap to add image label"
+    },
+    "selected_date": "Selected Date",
+    "@selected_date": {
+        "description": "String for the selected date label"
+    },
+    "start": "Start",
+    "@start": {
+        "description": "String for the start time label"
+    },
+    "end": "End",
+    "@end": {
+        "description": "String for the end time label"
+    },
+    "login": "Login",
+    "@login": {
+        "description": "String for the login screen title"
+    },
+    "insert_email": "Insert Email",
+    "@insert_email": {
+        "description": "String for the insert email label"
+    },
+    "insert_password": "Insert Password",
+    "@insert_password": {
+        "description": "String for the insert password label"
+    },
+    "reset_password": "Reset Password",
+    "@reset_password": {
+        "description": "String for the reset password label"
+    },
+    "password_reset_email_sent": "Password reset email sent. Please check your inbox.",
+    "@password_reset_email_sent": {
+        "description": "String for the password reset email sent message"
+    },
+    "no_user_found_for_that_email": "No user found for that email.",
+    "@no_user_found_for_that_email": {
+        "description": "String for the no user found for that email error"
+    },
+    "an_error_occurred": "An error occurred. Please try again.",
+    "@an_error_occurred": {
+        "description": "String for the generic error message"
+    },
+    "user_or_password_incorrect": "User or password is incorrect.",
+    "@user_or_password_incorrect": {
+        "description": "String for the user or password incorrect error"
+    },
+    "please_verify_your_email": "Please verify your email to log in.",
+    "@please_verify_your_email": {
+        "description": "String for the please verify your email message"
+    },
+    "register": "Register",
+    "@register": {
+        "description": "String for the register screen title"
+    },
+    "confirm_password": "Confirm Password",
+    "@confirm_password": {
+        "description": "String for the confirm password label"
+    },
+    "invalid_email_address": "That's not a valid email address.",
+    "@invalid_email_address": {
+        "description": "String for the invalid email address error"
+    },
+    "passwords_do_not_match": "Passwords do not match.",
+    "@passwords_do_not_match": {
+        "description": "String for the passwords do not match error"
+    },
+    "password_too_weak": "The password provided is too weak.",
+    "@password_too_weak": {
+        "description": "String for the password too weak error"
+    },
+    "email_already_in_use": "The account already exists for that email.",
+    "@email_already_in_use": {
+        "description": "String for the email already in use error"
+    }
+}

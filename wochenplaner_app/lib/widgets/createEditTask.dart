@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
@@ -71,7 +72,9 @@ class _CreateedittaskState extends State<Createedittask> {
   void saveTask() async {
     if (taskNameController.text.isEmpty) {
       setState(() {
-        errorText = Text('Task name is empty',
+        errorText = Text(
+            AppLocalizations.of(context)?.task_name_empty ??
+                'Task name is empty',
             style: TextStyle(color: Theme.of(context).colorScheme.error));
       });
       return;
@@ -84,7 +87,9 @@ class _CreateedittaskState extends State<Createedittask> {
           : DateFormat('yyyy-MM-dd').parseStrict(selectedDateController.text);
     } catch (e) {
       setState(() {
-        errorText = Text('Invalid date format. Use yyyy-MM-dd',
+        errorText = Text(
+            AppLocalizations.of(context)?.invalid_date_format ??
+                'Invalid date format. Use yyyy-MM-dd',
             style: TextStyle(color: Theme.of(context).colorScheme.error));
       });
       return;
@@ -95,7 +100,9 @@ class _CreateedittaskState extends State<Createedittask> {
       DateTime today = DateTime(now.year, now.month, now.day);
       if (selDate.isBefore(today)) {
         setState(() {
-          errorText = Text('Selected date is before current date',
+          errorText = Text(
+              AppLocalizations.of(context)?.selected_date_before_current_date ??
+                  'Selected date is before current date',
               style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
@@ -114,7 +121,9 @@ class _CreateedittaskState extends State<Createedittask> {
             : DateFormat('HH:mm').parseStrict(startTimeController.text);
       } catch (e) {
         setState(() {
-          errorText = Text('Invalid start time format. Use hh:mm a or HH:mm',
+          errorText = Text(
+              AppLocalizations.of(context)?.invalid_start_time_format ??
+                  'Invalid start time format. Use hh:mm a or HH:mm',
               style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
@@ -133,7 +142,9 @@ class _CreateedittaskState extends State<Createedittask> {
             : DateFormat('HH:mm').parseStrict(endTimeController.text);
       } catch (e) {
         setState(() {
-          errorText = Text('Invalid end time format. Use hh:mm a or HH:mm',
+          errorText = Text(
+              AppLocalizations.of(context)?.invalid_end_time_format ??
+                  'Invalid end time format. Use hh:mm a or HH:mm',
               style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
@@ -152,7 +163,9 @@ class _CreateedittaskState extends State<Createedittask> {
             (endTime.hour == 0 && endTime.minute > 0))) {
       if (endTime.hour != 0 && endTime.minute != 0) {
         setState(() {
-          errorText = Text('Start is after or equal to end',
+          errorText = Text(
+              AppLocalizations.of(context)?.start_after_or_equal_to_end ??
+                  'Start is after or equal to end',
               style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
         return;
@@ -191,10 +204,11 @@ class _CreateedittaskState extends State<Createedittask> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Image'),
+          title: Text(
+              AppLocalizations.of(context)?.select_image ?? 'Select Image'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Camera'),
+              child: Text(AppLocalizations.of(context)?.camera ?? 'Camera'),
               onPressed: () async {
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.camera);
@@ -202,7 +216,7 @@ class _CreateedittaskState extends State<Createedittask> {
               },
             ),
             TextButton(
-              child: const Text('Gallery'),
+              child: Text(AppLocalizations.of(context)?.gallery ?? 'Gallery'),
               onPressed: () async {
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.gallery);
@@ -229,7 +243,8 @@ class _CreateedittaskState extends State<Createedittask> {
         }
       } catch (e) {
         setState(() {
-          errorText = Text('Failed to pick image: $e',
+          errorText = Text(
+              '${AppLocalizations.of(context)?.failed_to_pick_image ?? 'Failed to pick image:'} $e',
               style: TextStyle(color: Theme.of(context).colorScheme.error));
         });
       }
@@ -247,7 +262,8 @@ class _CreateedittaskState extends State<Createedittask> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create/Edit Task'),
+        title: Text(AppLocalizations.of(context)?.create_edit_task ??
+            'Create/Edit Task'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -258,7 +274,8 @@ class _CreateedittaskState extends State<Createedittask> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TaskTextField(
-                    labelText: "Enter task name",
+                    labelText: AppLocalizations.of(context)?.enter_task_name ??
+                        "Enter task name",
                     widthMultiplyer: 2,
                     controller: taskNameController,
                     maxInputLength: 20,
@@ -267,7 +284,9 @@ class _CreateedittaskState extends State<Createedittask> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TaskTextField(
-                    labelText: "Enter task description",
+                    labelText:
+                        AppLocalizations.of(context)?.enter_task_description ??
+                            "Enter task description",
                     widthMultiplyer: 2,
                     controller: taskDescriptionController,
                     maxInputLength: 120,
@@ -304,7 +323,10 @@ class _CreateedittaskState extends State<Createedittask> {
                             BorderRadius.circular(12.0), // Rounded corners
                       ),
                       child: _imageBytes == null
-                          ? const Center(child: Text('Tap to add an image'))
+                          ? Center(
+                              child: Text(AppLocalizations.of(context)
+                                      ?.tap_to_add_image ??
+                                  'Tap to add an image'))
                           : Stack(
                               fit: StackFit.expand,
                               children: [
@@ -421,7 +443,8 @@ class _SelectDateState extends State<SelectDate> {
       child: Stack(
         children: <Widget>[
           TaskTextField(
-            labelText: 'Selected Date',
+            labelText:
+                AppLocalizations.of(context)?.selected_date ?? 'Selected Date',
             widthMultiplyer: 2,
             controller: widget.controller,
           ),
@@ -498,7 +521,7 @@ class _SelectTimeState extends State<SelectTime> {
           Stack(
             children: <Widget>[
               TaskTextField(
-                labelText: 'Start',
+                labelText: AppLocalizations.of(context)?.start ?? 'start',
                 value: formattedStartTime,
                 controller: widget.startTimeController,
               ),
@@ -516,7 +539,7 @@ class _SelectTimeState extends State<SelectTime> {
           Stack(
             children: <Widget>[
               TaskTextField(
-                labelText: 'End',
+                labelText: AppLocalizations.of(context)?.end ?? 'End',
                 value: formattedEndTime,
                 controller: widget.endTimeController,
               ),
@@ -552,7 +575,7 @@ class _saveButtonState extends State<SaveButton> {
         widget.saveTask();
       },
       style: StaticStyles.appButtonStyle(context),
-      child: const Text('Save'),
+      child: Text(AppLocalizations.of(context)?.save ?? 'Save'),
     );
   }
 }
@@ -567,7 +590,7 @@ class CancelButton extends StatelessWidget {
     return ElevatedButton(
       style: StaticStyles.appButtonStyle(context),
       onPressed: onPressed,
-      child: const Text('Cancel'),
+      child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
     );
   }
 }

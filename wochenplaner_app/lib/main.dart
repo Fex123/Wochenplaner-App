@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:wochenplaner_app/data/settings.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/data/userManagement.dart';
@@ -10,6 +11,8 @@ import 'package:wochenplaner_app/altTheme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:wochenplaner_app/staticAppVariables.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,11 +38,18 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.light;
+  Locale _locale = Locale('en'); // Default locale
 
   void toggleThemeMode() {
     setState(() {
       _themeMode =
           _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
+
+  void _changeLanguage(Locale locale) {
+    setState(() {
+      _locale = locale;
     });
   }
 
@@ -53,6 +63,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     mainTheme = MaterialTheme(textTheme);
     return MaterialApp(
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('de'), Locale('en')],
+      locale: _locale,
       title: 'Wochenplaner',
       theme: mainTheme.light(),
       darkTheme: mainTheme.dark(),
@@ -61,11 +79,13 @@ class _MyAppState extends State<MyApp> {
           ? MyHomePage(
               taskManager: TaskManager(FirebaseAuth.instance.currentUser!.uid),
               toggleThemeMode: toggleThemeMode,
+              changeLocale: _changeLanguage,
               settings: widget.settings,
             )
           : LoginScreen(
               settings: widget.settings,
               toggleThemeMode: toggleThemeMode,
+              changeLocale: _changeLanguage,
             ),
     );
   }
@@ -76,8 +96,10 @@ class MyHomePage extends StatefulWidget {
       {super.key,
       required this.taskManager,
       required this.toggleThemeMode,
-      required this.settings});
+      required this.settings,
+      required this.changeLocale});
   final VoidCallback toggleThemeMode;
+  final void Function(Locale) changeLocale;
   final TaskManager taskManager;
   final Settings settings;
 
@@ -108,6 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 : _selectedId == 2
                     ? SettingsView(
                         toggleThemeMode: widget.toggleThemeMode,
+                        changeLocale: widget.changeLocale,
                         settings: widget.settings,
                         taskManager: widget.taskManager,
                       )

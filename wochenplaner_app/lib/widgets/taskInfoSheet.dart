@@ -5,6 +5,7 @@ import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart'; // Ensure this import is correct
 import 'dart:convert';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskInfoSheet extends StatelessWidget {
   final Task task;
@@ -73,12 +74,12 @@ class TaskInfoSheet extends StatelessWidget {
                 ],
                 if (task.taskDate != null)
                   Text(
-                    'Datum: ${DateFormat.yMMMd().format(task.taskDate!)}',
+                    '${AppLocalizations.of(context)?.date ?? 'Date:'} ${DateFormat.yMMMd().format(task.taskDate!)}',
                     style: const TextStyle(fontSize: 16),
                   ),
                 if (task.startTime != null && task.endTime != null) ...[
                   Text(
-                    'Zeitraum: ${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}',
+                    '${AppLocalizations.of(context)?.time_period ?? 'Time period:'} ${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}',
                     style: const TextStyle(fontSize: 16),
                   ),
                   const Divider(), // Divider under the time
@@ -129,16 +130,18 @@ class TaskInfoSheet extends StatelessWidget {
                             onTaskUpdated(); // Refresh the task list
                           }
                         },
-                        child: const Text('bearbeiten'),
+                        child:
+                            Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
                       ),
                       const SizedBox(width: 16), // Abstand zwischen den Buttons
                       IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () async {
-                          bool confirm = await taskManager.removeTask(context, task);
-                          if(confirm) {
-                          Navigator.pop(context); // Schließt das Bottom Sheet
-                          onTaskRemoved(); // Aktualisiert die Ansicht
+                          bool confirm =
+                              await taskManager.removeTask(context, task);
+                          if (confirm) {
+                            Navigator.pop(context); // Schließt das Bottom Sheet
+                            onTaskRemoved(); // Aktualisiert die Ansicht
                           }
                         },
                       ),

@@ -14,6 +14,10 @@ class AppColors {
   static const Color onDone = Color.fromARGB(255, 255, 255, 255);
 }
 
+class AppLocales {
+  static const List<String> supportedLocales = ['de', 'en'];
+}
+
 class StaticComponents {
   static staticAppBar(String title, BuildContext context) {
     return AppBar(
