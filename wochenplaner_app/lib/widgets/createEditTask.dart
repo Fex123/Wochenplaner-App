@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:wochenplaner_app/staticAppVariables.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:file_picker/file_picker.dart';
 
 class Createedittask extends StatefulWidget {
   final TaskManager taskManager;
@@ -153,23 +154,16 @@ class _CreateedittaskState extends State<Createedittask> {
 
     if (startTime != null &&
         endTime != null &&
-        !(TimeOfDay.fromDateTime(startTime).period == DayPeriod.pm &&
-            TimeOfDay.fromDateTime(startTime).hour == 12 &&
-            TimeOfDay.fromDateTime(endTime).period == DayPeriod.am &&
-            TimeOfDay.fromDateTime(endTime).hour == 0) &&
-        (startTime.hour > endTime.hour ||
+        (startTime.isAfter(endTime) ||
             (startTime.hour == endTime.hour &&
-                startTime.minute >= endTime.minute) ||
-            (endTime.hour == 0 && endTime.minute > 0))) {
-      if (endTime.hour != 0 && endTime.minute != 0) {
-        setState(() {
-          errorText = Text(
-              AppLocalizations.of(context)?.start_after_or_equal_to_end ??
-                  'Start is after or equal to end',
-              style: TextStyle(color: Theme.of(context).colorScheme.error));
-        });
-        return;
-      }
+                startTime.minute >= endTime.minute))) {
+      setState(() {
+        errorText = Text(
+            AppLocalizations.of(context)?.start_after_or_equal_to_end ??
+                'Start is after or equal to end',
+            style: TextStyle(color: Theme.of(context).colorScheme.error));
+      });
+      return;
     }
 
     Task newTask;
@@ -258,17 +252,68 @@ class _CreateedittaskState extends State<Createedittask> {
     });
   }
 
+  Future<void> _importTask() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+
+    if (result != null) {
+      String fileContent = await File(result.files.single.path!).readAsString();
+      List<String> lines = fileContent.split('\n');
+
+      if (lines.length >= 4) {
+        String title = lines[0];
+        String description = lines[1];
+        DateTime? taskDate;
+        DateTime? startTime;
+        DateTime? endTime;
+
+        try {
+          taskDate = lines[2].isNotEmpty ? DateFormat.yMMMd().parse(lines[2]) : null;
+          if (lines[3].isNotEmpty) {
+            List<String> times = lines[3].split(' - ');
+            startTime = DateFormat.jm().parse(times[0]);
+            endTime = DateFormat.jm().parse(times[1]);
+          }
+        } catch (e) {
+          setState(() {
+            errorText = Text(
+              'Invalid date or time format in the file',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            );
+          });
+          return;
+        }
+
+        setState(() {
+          taskNameController.text = title;
+          taskDescriptionController.text = description;
+          selectedDateController.text = taskDate != null ? DateFormat('yyyy-MM-dd').format(taskDate) : '';
+          startTimeController.text = startTime != null ? _formatTime(startTime) : '';
+          endTimeController.text = endTime != null ? _formatTime(endTime) : '';
+        });
+      } else {
+        setState(() {
+          errorText = Text(
+            'Invalid file format',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          );
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)?.create_edit_task ??
-            'Create/Edit Task'),
-      ),
+      appBar: StaticComponents.staticAppBar(
+          AppLocalizations.of(context)?.create_edit_task ?? 'Create/Edit Task',
+          context),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.only(top: 50.0), // Add top margin
+            padding: const EdgeInsets.only(top: 50.0),
             child: Column(
               children: [
                 Padding(
@@ -320,7 +365,7 @@ class _CreateedittaskState extends State<Createedittask> {
                                 Theme.of(context).colorScheme.primaryContainer),
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius:
-                            BorderRadius.circular(12.0), // Rounded corners
+                            BorderRadius.circular(12.0),
                       ),
                       child: _imageBytes == null
                           ? Center(
@@ -354,6 +399,13 @@ class _CreateedittaskState extends State<Createedittask> {
                   ),
                 ),
                 Center(
+                child: ElevatedButton(
+                        onPressed: _importTask,
+                        style: StaticStyles.appButtonStyle(context),
+                        child: Text(AppLocalizations.of(context)?.cancel ?? 'Import'), // Import Task / Task Importieren
+                      ),
+                ),
+                Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -362,8 +414,9 @@ class _CreateedittaskState extends State<Createedittask> {
                           Navigator.pop(context, null);
                         },
                       ),
-                      const SizedBox(width: 16), // Abstand zwischen den Buttons
+                      const SizedBox(width: 16),
                       SaveButton(saveTask: saveTask),
+                      const SizedBox(width: 16),
                     ],
                   ),
                 ),

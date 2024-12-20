@@ -71,180 +71,182 @@ class _SettingsViewState extends State<SettingsView> {
     return Scaffold(
       appBar: StaticComponents.staticAppBar(
           AppLocalizations.of(context)?.settings ?? "Settings", context),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: CustomSwitch(
-                  toggleState: widget.toggleThemeMode,
-                  description:
-                      AppLocalizations.of(context)?.activate_dark_mode ??
-                          "Activate dark mode",
-                  settings: widget.settings,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20.0),
                 ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    CustomSlider(
-                      value: startHour,
-                      onChanged: (double value) {
-                        updateStartHour(value);
-                      },
-                      min: 0,
-                      max: (endHour - 1).toInt(),
-                      description: AppLocalizations.of(context)
-                              ?.set_calendar_view_range_from ??
-                          "Set Calendar view range from:",
-                    ),
-                    CustomSlider(
-                      value: endHour,
-                      onChanged: (double value) {
-                        updateEndHour(value);
-                      },
-                      min: (startHour + 1).toInt(),
-                      max: 24,
-                      description: AppLocalizations.of(context)?.to ?? "To:",
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    CustomSwitch(
-                      toggleState: toggleHalfHourLines,
-                      description:
-                          AppLocalizations.of(context)?.show_half_hour_lines ??
-                              "Show half Hour Lines",
-                      settings: widget.settings,
-                      getValue: () =>
-                          widget.settings.getSelectedHalfHourLines(),
-                      setValue: (bool value) =>
-                          widget.settings.setSelectedHalfHourLines(value),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Padding(
+                child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(AppLocalizations.of(context)?.language ??
-                            "Language"),
-                        DropdownButton<String>(
-                          value: lang,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              lang = newValue!;
-                              widget.settings.setLocale(newValue);
-                              widget.changeLocale(Locale(newValue));
-                            });
-                          },
-                          items: AppLocales.supportedLocales
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ])),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(20.0),
+                  child: CustomSwitch(
+                    toggleState: widget.toggleThemeMode,
+                    description:
+                        AppLocalizations.of(context)?.activate_dark_mode ??
+                            "Activate dark mode",
+                    settings: widget.settings,
+                  ),
+                ),
               ),
-              child: ElevatedButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  if (widget.settings.getAutoLogin()) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LoginScreen(
-                                  settings: widget.settings,
-                                  toggleThemeMode: widget.toggleThemeMode,
-                                  changeLocale: widget
-                                      .changeLocale, //TODO: could cause error? Might be cyclic/ endless recursive
-                                )));
-                  } else {
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      CustomSlider(
+                        value: startHour,
+                        onChanged: (double value) {
+                          updateStartHour(value);
+                        },
+                        min: 0,
+                        max: (endHour - 1).toInt(),
+                        description: AppLocalizations.of(context)
+                                ?.set_calendar_view_range_from ??
+                            "Set Calendar view range from:",
+                      ),
+                      CustomSlider(
+                        value: endHour,
+                        onChanged: (double value) {
+                          updateEndHour(value);
+                        },
+                        min: (startHour + 1).toInt(),
+                        max: 24,
+                        description: AppLocalizations.of(context)?.to ?? "To:",
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      CustomSwitch(
+                        toggleState: toggleHalfHourLines,
+                        description: AppLocalizations.of(context)
+                                ?.show_half_hour_lines ??
+                            "Show half Hour Lines",
+                        settings: widget.settings,
+                        getValue: () =>
+                            widget.settings.getSelectedHalfHourLines(),
+                        setValue: (bool value) =>
+                            widget.settings.setSelectedHalfHourLines(value),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(AppLocalizations.of(context)?.language ??
+                              "Language"),
+                          DropdownButton<String>(
+                            value: lang,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                lang = newValue!;
+                                widget.settings.setLocale(newValue);
+                                widget.changeLocale(Locale(newValue));
+                              });
+                            },
+                            items: AppLocales.supportedLocales
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                          ),
+                        ])),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                    if (widget.settings.getAutoLogin()) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen(
+                                    settings: widget.settings,
+                                    toggleThemeMode: widget.toggleThemeMode,
+                                    changeLocale: widget
+                                        .changeLocale, //TODO: could cause error? Might be cyclic/ endless recursive
+                                  )));
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Theme.of(context).colorScheme.onError,
+                  ),
+                  child: Text(AppLocalizations.of(context)?.account_logout ??
+                      "Account Logout"),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    widget.taskManager.deleteCollection();
+                    FirebaseAuth.instance.currentUser!.delete();
                     Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Theme.of(context).colorScheme.onError,
+                  ),
+                  child: Text(AppLocalizations.of(context)?.delete_account ??
+                      "Delete Account"),
                 ),
-                child: Text(AppLocalizations.of(context)?.account_logout ??
-                    "Account Logout"),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  widget.taskManager.deleteCollection();
-                  FirebaseAuth.instance.currentUser!.delete();
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
-                ),
-                child: Text(AppLocalizations.of(context)?.delete_account ??
-                    "Delete Account"),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

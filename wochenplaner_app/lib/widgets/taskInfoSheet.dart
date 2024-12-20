@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wochenplaner_app/data/Task.dart';
 import 'package:wochenplaner_app/data/taskStorage.dart';
 import 'package:wochenplaner_app/widgets/createEditTask.dart'; // Ensure this import is correct
@@ -112,7 +113,9 @@ class TaskInfoSheet extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
+                      const SizedBox(width: 16), // Abstand zwischen den Buttons
+                      IconButton(
+                        icon: const Icon(Icons.edit),
                         onPressed: () async {
                           Navigator.pop(context);
                           Task? newTask = await Navigator.push(
@@ -130,8 +133,6 @@ class TaskInfoSheet extends StatelessWidget {
                             onTaskUpdated(); // Refresh the task list
                           }
                         },
-                        child:
-                            Text(AppLocalizations.of(context)?.edit ?? 'Edit'),
                       ),
                       const SizedBox(width: 16), // Abstand zwischen den Buttons
                       IconButton(
@@ -142,6 +143,17 @@ class TaskInfoSheet extends StatelessWidget {
                           if (confirm) {
                             Navigator.pop(context); // Schließt das Bottom Sheet
                             onTaskRemoved(); // Aktualisiert die Ansicht
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 16), // Abstand zwischen den Buttons
+                      IconButton(
+                        icon: const Icon(Icons.share),
+                        onPressed: () async {
+                          final result = await Share.shareXFiles([XFile.fromData(utf8.encode('${task.title}\n${task.description ??''}\n${task.taskDate != null ? DateFormat.yMMMd().format(task.taskDate!) : ''}\n${task.startTime != null && task.endTime != null ? '${DateFormat.jm().format(task.startTime!)} - ${DateFormat.jm().format(task.endTime!)}' : ''}'), mimeType: 'text/plain')], fileNameOverrides: ['${task.title}.txt']);
+
+                          if (result.status == ShareResultStatus.success) {
+                            print('Thank you for sharing my website!');
                           }
                         },
                       ),
